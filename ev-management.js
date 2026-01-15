@@ -74,8 +74,8 @@ function updateEVList() {
             <div class="stat-label">Status</div>
             <div style="margin-top: 0.25rem;">
               ${ev.isCharging ? 
-                '<span class="badge badge-success"><i class="fas fa-charging-station"></i> Charging</span>' :
-                '<span class="badge badge-info"><i class="fas fa-pause"></i> Not Charging</span>'
+                '<span class="badge badge-success"><i class="fas fa-charging-station"></i>&nbsp;&nbsp;Charging</span>' :
+                '<span class="badge badge-info"><i class="fas fa-pause"></i>&nbsp;&nbsp;Not Charging</span>'
               }
             </div>
           </div>
