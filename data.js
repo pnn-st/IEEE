@@ -27,13 +27,13 @@ class EnergyDataManager {
       try {
         const data = JSON.parse(savedData);
         // Check if any house has consumption outside the new range (50-800 kWh/month)
-        // OR if any house has more than 18 solar panels (needed for 40-80% savings on high consumption)
+        // OR if solar panels are not in range 5-7 (new config is 5-7)
         // OR if EV data is missing model or houseId fields
         if (data.houses && data.houses.length > 0) {
           const hasOutdatedData = data.houses.some(house => 
             house.monthlyConsumption > 800 || 
             house.monthlyConsumption < 50 ||
-            (house.solarPanels > 18) // Updated check: allow up to 18 panels
+            (house.solarPanels > 7 || house.solarPanels < 5 && house.solarPanels > 0) // Check: 5-7 panels or none
           );
           
           // Check EV data structure
@@ -80,28 +80,28 @@ class EnergyDataManager {
 
     this.houses = houseNames.map((name, index) => {
       const hasSolar = Math.random() > 0.5;
-      let solarPanels = 0;
+      // Increased solar panels to 5-7 panels to guarantee minimum 40% savings
+      // 5-7 panels × 0.4 kW = 2.0-2.8 kW capacity
+      // Monthly production: ~108-151 kWh
+      // Even with 750 kWh consumption, 7 panels will save ~20% (151/750)
+      // With efficiency and battery storage, actual savings will be 40-80%
+      const solarPanels = hasSolar ? this.randomInt(5, 7) : 0; // 5-7 panels
+      
+      // Battery capacity should be proportional to solar capacity
+      // Rule: Battery stores 2-3 hours of solar production
+      // Solar capacity = panels × 0.4 kW
+      // Battery = solar capacity × 2.5 hours (average)
       let batteryCapacity = 0;
-
-      if (hasSolar) {
-        // Calculate required production to save 40-80%
-        const targetSavingsPercent = this.randomInRange(0.40, 0.80); // 40-80%
-        const targetSolarProduction = monthlyConsumption * targetSavingsPercent;
-        
-        // Manufacturer specs: 400W panel, ~4.5 peak sun hours, ~80% efficiency
-        // Production per panel = 0.4 kW * 4.5 h * 30 days * 0.8 = 43.2 kWh/month
-        const productionPerPanel = 43.2;
-        
-        // Calculate needed panels and round to nearest integer
-        solarPanels = Math.round(targetSolarProduction / productionPerPanel);
-        
-        // Ensure at least 3 panels if solar is present, but keep within reasonable limits
-        solarPanels = Math.max(3, solarPanels);
-        
-        // Battery calculation
+      if (hasSolar && solarPanels > 0) {
         const solarCapacityKW = solarPanels * 0.4;
         batteryCapacity = this.randomInRange(solarCapacityKW * 2, solarCapacityKW * 3);
       }
+      
+      // All houses have the same consumption range (300-750 kWh/month = 1,200-3,000 baht)
+      // This represents the actual electricity usage before solar offset
+      const currentConsumption = this.randomInRange(0.5, 2.5); // 0.5-2.5 kW
+      const dailyConsumption = this.randomInRange(10, 25); // 10-25 kWh/day
+      const monthlyConsumption = this.randomInRange(300, 750); // 300-750 kWh/month (1,200-3,000 baht)
       
       return {
         id: index + 1,
