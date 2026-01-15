@@ -21,7 +21,39 @@ class EnergyDataManager {
       localStorage.removeItem('energyData');
     }
     
+    // Check if saved data has outdated consumption values or solar panel configuration
+    let needsReset = false;
     if (savedData && !(/[\u0E00-\u0E7F]/.test(savedData))) {
+      try {
+        const data = JSON.parse(savedData);
+        // Check if any house has consumption outside the new range (50-800 kWh/month)
+        // OR if solar panels are not in range 5-7 (new config is 5-7)
+        // OR if EV data is missing model or houseId fields
+        if (data.houses && data.houses.length > 0) {
+          const hasOutdatedData = data.houses.some(house => 
+            house.monthlyConsumption > 800 || 
+            house.monthlyConsumption < 50 ||
+            (house.solarPanels > 7 || house.solarPanels < 5 && house.solarPanels > 0) // Check: 5-7 panels or none
+          );
+          
+          // Check EV data structure
+          const hasOutdatedEVData = data.evData && data.evData.length > 0 && 
+            data.evData.some(ev => !ev.model || !ev.houseId);
+          
+          if (hasOutdatedData || hasOutdatedEVData) {
+            console.log('Detected outdated consumption, solar panel, or EV data, resetting...');
+            needsReset = true;
+            localStorage.removeItem('energyData');
+          }
+        }
+      } catch (e) {
+        console.log('Error parsing saved data, clearing...');
+        needsReset = true;
+        localStorage.removeItem('energyData');
+      }
+    }
+    
+    if (savedData && !needsReset && !(/[\u0E00-\u0E7F]/.test(savedData))) {
       const data = JSON.parse(savedData);
       this.houses = data.houses;
       this.evData = data.evData;
@@ -48,14 +80,25 @@ class EnergyDataManager {
 
     this.houses = houseNames.map((name, index) => {
       const hasSolar = Math.random() > 0.5;
-      const solarPanels = hasSolar ? this.randomInt(4, 8) : 0; // 4-8 panels or none
-      
-      // Battery capacity should be proportional to solar capacity
-      // Rule: Battery stores 2-3 hours of solar production
-      // Solar capacity = panels × 0.4 kW
-      // Battery = solar capacity × 2.5 hours (average)
+      let solarPanels = 0;
       let batteryCapacity = 0;
-      if (hasSolar && solarPanels > 0) {
+
+      if (hasSolar) {
+        // Calculate required production to save 40-80%
+        const targetSavingsPercent = this.randomInRange(0.40, 0.80); // 40-80%
+        const targetSolarProduction = monthlyConsumption * targetSavingsPercent;
+        
+        // Manufacturer specs: 400W panel, ~4.5 peak sun hours, ~80% efficiency
+        // Production per panel = 0.4 kW * 4.5 h * 30 days * 0.8 = 43.2 kWh/month
+        const productionPerPanel = 43.2;
+        
+        // Calculate needed panels and round to nearest integer
+        solarPanels = Math.round(targetSolarProduction / productionPerPanel);
+        
+        // Ensure at least 3 panels if solar is present, but keep within reasonable limits
+        solarPanels = Math.max(3, solarPanels);
+        
+        // Battery calculation
         const solarCapacityKW = solarPanels * 0.4;
         batteryCapacity = this.randomInRange(solarCapacityKW * 2, solarCapacityKW * 3);
       }
@@ -63,9 +106,9 @@ class EnergyDataManager {
       return {
         id: index + 1,
         name: name,
-        currentConsumption: this.randomInRange(0.3, 2.5), // 0.3-2.5 kW (realistic range)
-        dailyConsumption: this.randomInRange(5, 15), // 5-15 kWh/day (typical Thai household)
-        monthlyConsumption: this.randomInRange(150, 450), // 150-450 kWh/month
+        currentConsumption: currentConsumption,
+        dailyConsumption: dailyConsumption,
+        monthlyConsumption: monthlyConsumption,
         residents: this.randomInt(2, 6),
         solarPanels: solarPanels,
         batteryCapacity: batteryCapacity, // Correlated with solar capacity
@@ -130,7 +173,7 @@ class EnergyDataManager {
       day.setDate(day.getDate() - i);
       history.daily.push({
         timestamp: day.toISOString(),
-        consumption: this.randomInRange(5, 15) // 5-15 kWh per day (realistic)
+        consumption: this.randomInRange(2.5, 7) // 2.5-7 kWh per day
       });
     }
 
@@ -142,7 +185,7 @@ class EnergyDataManager {
       month.setMonth(month.getMonth() - i);
       history.monthly.push({
         month: months[month.getMonth()],
-        consumption: this.randomInRange(150, 450) // 150-450 kWh per month (realistic)
+        consumption: this.randomInRange(80, 200) // 80-200 kWh per month (320-800 baht)
       });
     }
 
@@ -154,16 +197,25 @@ class EnergyDataManager {
     const evCount = this.randomInt(3, 6); // 3-6 EVs in community
     const evData = [];
     
+    // EV models available in Thailand
+    const evModels = [
+      'Nissan Leaf', 'BYD Atto 3', 'MG ZS EV', 'MG EP',
+      'Tesla Model 3', 'Hyundai Kona Electric', 'Neta V'
+    ];
+    
     for (let i = 0; i < evCount; i++) {
       const isCharging = Math.random() > 0.5;
       const currentCharge = this.randomInRange(20, 95); // 20-95% charge
       const batteryCapacity = this.randomInRange(40, 75); // 40-75 kWh (realistic EV battery)
       const chargingPower = isCharging ? this.randomInRange(3, 7) : 0; // 3-7 kW charging
+      const houseId = this.randomInt(1, 12); // Random house ID (1-12)
       
       evData.push({
         id: i + 1,
         name: `EV-${String(i + 1).padStart(3, '0')}`,
-        owner: `House No. ${this.randomInt(101, 112)}`,
+        model: evModels[this.randomInt(0, evModels.length - 1)], // Random EV model
+        houseId: houseId, // House ID for lookup
+        owner: `House No. ${100 + houseId}`, // House name for display
         batteryCapacity: batteryCapacity,
         currentCharge: currentCharge,
         isCharging: isCharging,
@@ -363,6 +415,103 @@ class EnergyDataManager {
     if (!house) return 0;
     
     return (this.solarData.currentProduction * house.solarAllocation / 100).toFixed(2);
+  }
+
+  // Calculate current monthly electricity cost (without solar)
+  calculateCurrentMonthlyCost(houseId) {
+    const house = this.getHouse(houseId);
+    if (!house) return 0;
+    
+    const electricityRate = 4; // THB per kWh
+    return house.monthlyConsumption * electricityRate;
+  }
+
+  // Calculate projected monthly cost with solar panels
+  calculateSolarMonthlyCost(houseId) {
+    const house = this.getHouse(houseId);
+    if (!house) return { cost: 0, savings: 0, solarProduction: 0 };
+    
+    const electricityRate = 4; // THB per kWh
+    
+    // Calculate solar production per month
+    // Each panel = 400W, average 4.5 peak sun hours per day in Thailand
+    const panelWattage = 0.4; // kW per panel
+    const peakSunHours = 4.5;
+    const daysPerMonth = 30;
+    const systemEfficiency = 0.8;
+    
+    const monthlySolarProduction = house.solarPanels * panelWattage * peakSunHours * daysPerMonth * systemEfficiency;
+    
+    // Calculate remaining consumption after solar
+    const remainingConsumption = Math.max(0, house.monthlyConsumption - monthlySolarProduction);
+    const costWithSolar = remainingConsumption * electricityRate;
+    const currentCost = house.monthlyConsumption * electricityRate;
+    const savings = currentCost - costWithSolar;
+    
+    return {
+      cost: costWithSolar,
+      savings: savings,
+      solarProduction: monthlySolarProduction
+    };
+  }
+
+  // Calculate potential savings if solar panels are installed
+  calculatePotentialSavings(houseId) {
+    const house = this.getHouse(houseId);
+    if (!house) return { cost: 0, savings: 0, recommendedPanels: 0 };
+    
+    // If house already has solar, return actual savings
+    if (house.solarPanels > 0) {
+      const result = this.calculateSolarMonthlyCost(houseId);
+      return {
+        cost: result.cost,
+        savings: result.savings,
+        hasSolar: true,
+        solarProduction: result.solarProduction
+      };
+    }
+    
+    // Calculate recommended solar system
+    const solarReq = this.calculateSolarRequirement(house.dailyConsumption);
+    const recommendedPanels = solarReq.numberOfPanels;
+    
+    // Calculate potential production with recommended panels
+    const electricityRate = 4; // THB per kWh
+    const panelWattage = 0.4; // kW per panel
+    const peakSunHours = 4.5;
+    const daysPerMonth = 30;
+    const systemEfficiency = 0.8;
+    
+    const monthlySolarProduction = recommendedPanels * panelWattage * peakSunHours * daysPerMonth * systemEfficiency;
+    const remainingConsumption = Math.max(0, house.monthlyConsumption - monthlySolarProduction);
+    const costWithSolar = remainingConsumption * electricityRate;
+    const currentCost = house.monthlyConsumption * electricityRate;
+    const potentialSavings = currentCost - costWithSolar;
+    
+    return {
+      cost: costWithSolar,
+      savings: potentialSavings,
+      recommendedPanels: recommendedPanels,
+      hasSolar: false,
+      solarProduction: monthlySolarProduction
+    };
+  }
+
+  // Get savings percentage
+  getSolarSavingsPercentage(houseId) {
+    const house = this.getHouse(houseId);
+    if (!house) return 0;
+    
+    const currentCost = this.calculateCurrentMonthlyCost(houseId);
+    if (currentCost === 0) return 0;
+    
+    if (house.solarPanels > 0) {
+      const solarResult = this.calculateSolarMonthlyCost(houseId);
+      return ((solarResult.savings / currentCost) * 100).toFixed(1);
+    } else {
+      const potentialResult = this.calculatePotentialSavings(houseId);
+      return ((potentialResult.savings / currentCost) * 100).toFixed(1);
+    }
   }
 }
 

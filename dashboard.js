@@ -49,6 +49,10 @@ function updateHouseCards() {
   window.energyData.houses.forEach(house => {
     const status = window.energyData.getConsumptionStatus(house.currentConsumption);
     
+    // Get cost comparison data
+    const currentCost = window.energyData.calculateCurrentMonthlyCost(house.id);
+    const savingsData = window.energyData.calculatePotentialSavings(house.id);
+    
     const card = document.createElement('div');
     card.className = 'house-card';
     card.innerHTML = `
@@ -68,6 +72,47 @@ function updateHouseCards() {
           </span>
         </div>
       ` : ''}
+      
+      ${savingsData.hasSolar ? `
+        <!-- Houses WITH solar: Show before/after costs -->
+        <div class="cost-comparison mt-2">
+          <div style="padding: 0.75rem; background: rgba(16, 185, 129, 0.1); border-radius: 8px; border-left: 3px solid var(--success);">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+              <div>
+                <div style="font-size: 0.7rem; color: var(--text-muted);">ค่าไฟก่อนหักโซล่า</div>
+                <div style="font-size: 0.95rem; font-weight: 600; color: var(--text-muted); text-decoration: line-through;">
+                  ${currentCost.toFixed(0)} ฿
+                </div>
+              </div>
+              <div style="text-align: right;">
+                <div style="font-size: 0.7rem; color: var(--success);">ค่าไฟหลังหักโซล่า</div>
+                <div style="font-size: 1.2rem; font-weight: 700; color: var(--success);">
+                  ${savingsData.cost.toFixed(0)} ฿
+                </div>
+              </div>
+            </div>
+            <div style="text-align: center; padding-top: 0.5rem; border-top: 1px solid rgba(16, 185, 129, 0.2);">
+              <div style="font-size: 0.85rem; font-weight: 600; color: var(--success);">
+                <i class="fas fa-arrow-down"></i> ประหยัด ${savingsData.savings.toFixed(0)} ฿/เดือน (${window.energyData.getSolarSavingsPercentage(house.id)}%)
+              </div>
+            </div>
+          </div>
+        </div>
+      ` : `
+        <!-- Houses WITHOUT solar: Show monthly cost only -->
+        <div class="cost-comparison mt-2">
+          <div style="padding: 0.75rem; background: rgba(59, 130, 246, 0.1); border-radius: 8px; border-left: 3px solid var(--primary-accent);">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div style="font-size: 0.75rem; color: var(--text-muted);">
+                ค่าไฟรายเดือน
+              </div>
+              <div style="font-size: 1.2rem; font-weight: 700; color: var(--primary-accent);">
+                ${currentCost.toFixed(0)} ฿
+              </div>
+            </div>
+          </div>
+        </div>
+      `}
     `;
     
     card.addEventListener('click', () => {
@@ -120,6 +165,11 @@ function showHouseDetails(houseId) {
   // Update modal content
   document.getElementById('modal-house-name').textContent = house.name;
   
+  // Get cost comparison data
+  const currentCost = window.energyData.calculateCurrentMonthlyCost(house.id);
+  const savingsData = window.energyData.calculatePotentialSavings(house.id);
+  const savingsPercentage = window.energyData.getSolarSavingsPercentage(house.id);
+  
   const appliancesHtml = house.appliances.map(a => `
     <tr>
       <td>${a.name}</td>
@@ -162,6 +212,69 @@ function showHouseDetails(houseId) {
         </div>
       </div>
     ` : ''}
+    
+    <!-- Cost Comparison Section -->
+    <div class="card mb-3" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(30, 35, 60, 0.5) 100%); border: 1px solid rgba(16, 185, 129, 0.3);">
+      <div class="card-header" style="border-bottom: 1px solid rgba(16, 185, 129, 0.2);">
+        <h4 style="margin: 0; color: var(--text-primary); font-size: 1.1rem;">
+          <i class="fas fa-chart-line" style="color: var(--success);"></i>
+          ${savingsData.hasSolar ? 'Monthly Cost Comparison' : 'Potential Cost Savings with Solar'}
+        </h4>
+      </div>
+      <div class="card-body">
+        <div class="grid grid-2 gap-3 mb-3">
+          <div style="text-align: center; padding: 1rem; background: rgba(239, 68, 68, 0.1); border-radius: 8px; border: 1px solid rgba(239, 68, 68, 0.3);">
+            <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem;">
+              <i class="fas fa-bolt"></i> Current Cost (No Solar)
+            </div>
+            <div style="font-size: 2rem; font-weight: 700; color: #ef4444;">
+              ${currentCost.toFixed(0)} ฿
+            </div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">
+              ${house.monthlyConsumption.toFixed(0)} kWh × 4 ฿/kWh
+            </div>
+          </div>
+          
+          <div style="text-align: center; padding: 1rem; background: rgba(16, 185, 129, 0.1); border-radius: 8px; border: 1px solid rgba(16, 185, 129, 0.3);">
+            <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem;">
+              <i class="fas fa-solar-panel"></i> ${savingsData.hasSolar ? 'Cost with Solar' : 'Projected Cost with Solar'}
+            </div>
+            <div style="font-size: 2rem; font-weight: 700; color: var(--success);">
+              ${savingsData.cost.toFixed(0)} ฿
+            </div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">
+              ${savingsData.hasSolar ? house.solarPanels : savingsData.recommendedPanels} panels producing ${savingsData.solarProduction.toFixed(0)} kWh/month
+            </div>
+          </div>
+        </div>
+        
+        <div style="text-align: center; padding: 1.5rem; background: rgba(16, 185, 129, 0.15); border-radius: 8px; border: 2px solid var(--success);">
+          <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem;">
+            <i class="fas fa-piggy-bank"></i> ${savingsData.hasSolar ? 'Monthly Savings' : 'Potential Monthly Savings'}
+          </div>
+          <div style="font-size: 2.5rem; font-weight: 700; color: var(--success); margin-bottom: 0.5rem;">
+            ${savingsData.savings.toFixed(0)} ฿
+          </div>
+          <div style="display: inline-block; padding: 0.5rem 1rem; background: var(--success); color: white; border-radius: 20px; font-weight: 600;">
+            <i class="fas fa-arrow-down"></i> ${savingsPercentage}% reduction
+          </div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 1rem;">
+            <i class="fas fa-calendar-alt"></i> Annual savings: <strong style="color: var(--success);">${(savingsData.savings * 12).toFixed(0)} ฿/year</strong>
+          </div>
+        </div>
+        
+        ${!savingsData.hasSolar ? `
+          <div class="alert alert-info mt-3" style="margin-bottom: 0;">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+              <strong>Recommendation:</strong> Install ${savingsData.recommendedPanels} solar panels (${(savingsData.recommendedPanels * 0.4).toFixed(1)} kW system) to achieve these savings.
+              <br><strong>Estimated Investment:</strong> ${((savingsData.recommendedPanels * 0.4) * 50000).toFixed(0)} ฿
+              <br><strong>Payback Period:</strong> ~${(((savingsData.recommendedPanels * 0.4) * 50000) / (savingsData.savings * 12)).toFixed(1)} years
+            </div>
+          </div>
+        ` : ''}
+      </div>
+    </div>
     
     <h4 style="margin: 1.5rem 0 1rem 0; color: var(--text-primary);">
       <i class="fas fa-plug"></i> Appliances

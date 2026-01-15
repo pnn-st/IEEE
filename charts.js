@@ -45,7 +45,7 @@ class ChartManager {
           padding: 12,
           displayColors: true,
           callbacks: {
-            label: function(context) {
+            label: function (context) {
               let label = context.dataset.label || '';
               if (label) {
                 label += ': ';
@@ -76,7 +76,7 @@ class ChartManager {
           ticks: {
             color: '#718096',
             font: { family: 'DynaPuff', size: 11 },
-            callback: function(value) {
+            callback: function (value) {
               return value + ' ' + (options.unit || 'kWh');
             }
           },
@@ -190,7 +190,7 @@ class ChartManager {
           borderWidth: 1,
           padding: 12,
           callbacks: {
-            label: function(context) {
+            label: function (context) {
               const label = context.label || '';
               const value = context.parsed || 0;
               const total = context.dataset.data.reduce((a, b) => a + b, 0);
@@ -238,7 +238,7 @@ class ChartManager {
   // Get chart colors array
   getColorArray(count) {
     const colors = [
-      '#00d4ff', '#7c3aed', '#10b981', '#f59e0b', 
+      '#00d4ff', '#7c3aed', '#10b981', '#f59e0b',
       '#ef4444', '#3b82f6', '#8b5cf6', '#ec4899',
       '#14b8a6', '#f97316', '#06b6d4', '#a855f7'
     ];
@@ -276,7 +276,7 @@ class ChartManager {
     });
 
     // Add method to update real-time data
-    chart.addDataPoint = function(label, value) {
+    chart.addDataPoint = function (label, value) {
       this.data.labels.push(label);
       this.data.datasets[0].data.push(value);
 
