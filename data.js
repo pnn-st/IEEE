@@ -46,31 +46,46 @@ class EnergyDataManager {
       'House No. 110', 'House No. 111', 'House No. 112'
     ];
 
-    this.houses = houseNames.map((name, index) => ({
-      id: index + 1,
-      name: name,
-      currentConsumption: this.randomInRange(2, 8), // kW
-      dailyConsumption: this.randomInRange(30, 80), // kWh
-      monthlyConsumption: this.randomInRange(800, 2400), // kWh
-      residents: this.randomInt(2, 6),
-      solarPanels: Math.random() > 0.6 ? this.randomInt(4, 12) : 0,
-      batteryCapacity: Math.random() > 0.6 ? this.randomInRange(5, 15) : 0, // kWh
-      appliances: this.generateAppliances(),
-      history: this.generateHistory(),
-      solarAllocation: 0 // Percentage from central solar
-    }));
+    this.houses = houseNames.map((name, index) => {
+      const hasSolar = Math.random() > 0.5;
+      const solarPanels = hasSolar ? this.randomInt(4, 8) : 0; // 4-8 panels or none
+      
+      // Battery capacity should be proportional to solar capacity
+      // Rule: Battery stores 2-3 hours of solar production
+      // Solar capacity = panels × 0.4 kW
+      // Battery = solar capacity × 2.5 hours (average)
+      let batteryCapacity = 0;
+      if (hasSolar && solarPanels > 0) {
+        const solarCapacityKW = solarPanels * 0.4;
+        batteryCapacity = this.randomInRange(solarCapacityKW * 2, solarCapacityKW * 3);
+      }
+      
+      return {
+        id: index + 1,
+        name: name,
+        currentConsumption: this.randomInRange(0.3, 2.5), // 0.3-2.5 kW (realistic range)
+        dailyConsumption: this.randomInRange(5, 15), // 5-15 kWh/day (typical Thai household)
+        monthlyConsumption: this.randomInRange(150, 450), // 150-450 kWh/month
+        residents: this.randomInt(2, 6),
+        solarPanels: solarPanels,
+        batteryCapacity: batteryCapacity, // Correlated with solar capacity
+        appliances: this.generateAppliances(),
+        history: this.generateHistory(),
+        solarAllocation: 0 // Percentage from central solar
+      };
+    });
   }
 
   // Generate appliance data for each house
   generateAppliances() {
     const applianceTypes = [
-      { name: 'Air Conditioner', power: this.randomInRange(1.5, 3.5), priority: 2 },
-      { name: 'Refrigerator', power: this.randomInRange(0.3, 0.8), priority: 1 },
-      { name: 'Washing Machine', power: this.randomInRange(0.5, 1.2), priority: 3 },
-      { name: 'TV', power: this.randomInRange(0.1, 0.3), priority: 3 },
-      { name: 'Electric Stove', power: this.randomInRange(1.0, 2.5), priority: 2 },
-      { name: 'Water Heater', power: this.randomInRange(2.0, 4.5), priority: 2 },
-      { name: 'Lights/Others', power: this.randomInRange(0.2, 0.5), priority: 1 }
+      { name: 'Air Conditioner', power: this.randomInRange(0.8, 1.5), priority: 2 }, // 800-1500W
+      { name: 'Refrigerator', power: this.randomInRange(0.08, 0.15), priority: 1 }, // 80-150W
+      { name: 'Washing Machine', power: this.randomInRange(0.3, 0.5), priority: 3 }, // 300-500W
+      { name: 'TV', power: this.randomInRange(0.05, 0.15), priority: 3 }, // 50-150W
+      { name: 'Electric Stove', power: this.randomInRange(1.0, 2.0), priority: 2 }, // 1000-2000W
+      { name: 'Water Heater', power: this.randomInRange(2.5, 3.5), priority: 2 }, // 2500-3500W
+      { name: 'Lights/Others', power: this.randomInRange(0.1, 0.3), priority: 1 } // 100-300W
     ];
 
     return applianceTypes.map((appliance, index) => ({
@@ -90,13 +105,22 @@ class EnergyDataManager {
       monthly: []
     };
 
-    // Hourly data for last 24 hours
+    // Hourly data for last 24 hours (more realistic pattern)
     for (let i = 23; i >= 0; i--) {
       const hour = new Date();
       hour.setHours(hour.getHours() - i);
+      const hourOfDay = hour.getHours();
+      
+      // Realistic consumption pattern: higher in morning (6-9) and evening (18-22)
+      let multiplier = 0.3; // Base consumption
+      if (hourOfDay >= 6 && hourOfDay <= 9) multiplier = 0.8; // Morning peak
+      else if (hourOfDay >= 18 && hourOfDay <= 22) multiplier = 1.0; // Evening peak
+      else if (hourOfDay >= 10 && hourOfDay <= 17) multiplier = 0.5; // Daytime
+      else multiplier = 0.2; // Night
+      
       history.hourly.push({
         timestamp: hour.toISOString(),
-        consumption: this.randomInRange(1, 10)
+        consumption: this.randomInRange(0.2, 2.5) * multiplier // Realistic hourly variation
       });
     }
 
@@ -106,7 +130,7 @@ class EnergyDataManager {
       day.setDate(day.getDate() - i);
       history.daily.push({
         timestamp: day.toISOString(),
-        consumption: this.randomInRange(30, 80)
+        consumption: this.randomInRange(5, 15) // 5-15 kWh per day (realistic)
       });
     }
 
@@ -118,7 +142,7 @@ class EnergyDataManager {
       month.setMonth(month.getMonth() - i);
       history.monthly.push({
         month: months[month.getMonth()],
-        consumption: this.randomInRange(800, 2400)
+        consumption: this.randomInRange(150, 450) // 150-450 kWh per month (realistic)
       });
     }
 
@@ -127,31 +151,29 @@ class EnergyDataManager {
 
   // Generate EV data
   generateEVData() {
-    const evModels = [
-      'Tesla Model 3', 'Nissan Leaf', 'BYD Atto 3',
-      'MG ZS EV', 'Hyundai Kona Electric', 'BMW i3'
-    ];
-
-    const numEVs = this.randomInt(4, 8);
-    this.evData = [];
-
-    for (let i = 0; i < numEVs; i++) {
-      const batteryCapacity = this.randomInRange(40, 75);
-      const currentCharge = this.randomInRange(20, 95);
-      const chargingPower = Math.random() > 0.5 ? this.randomInRange(3, 11) : 0;
+    const evCount = this.randomInt(3, 6); // 3-6 EVs in community
+    const evData = [];
+    
+    for (let i = 0; i < evCount; i++) {
+      const isCharging = Math.random() > 0.5;
+      const currentCharge = this.randomInRange(20, 95); // 20-95% charge
+      const batteryCapacity = this.randomInRange(40, 75); // 40-75 kWh (realistic EV battery)
+      const chargingPower = isCharging ? this.randomInRange(3, 7) : 0; // 3-7 kW charging
       
-      this.evData.push({
+      evData.push({
         id: i + 1,
-        houseId: this.randomInt(1, 12),
-        model: evModels[i % evModels.length],
-        batteryCapacity: batteryCapacity, // kWh
-        currentCharge: currentCharge, // %
-        chargingPower: chargingPower, // kW
-        isCharging: chargingPower > 0,
-        estimatedTimeToFull: chargingPower > 0 ? 
+        name: `EV-${String(i + 1).padStart(3, '0')}`,
+        owner: `House No. ${this.randomInt(101, 112)}`,
+        batteryCapacity: batteryCapacity,
+        currentCharge: currentCharge,
+        isCharging: isCharging,
+        chargingPower: chargingPower,
+        estimatedTimeToFull: isCharging ? 
           ((batteryCapacity * (100 - currentCharge) / 100) / chargingPower).toFixed(1) : 0
       });
     }
+    
+    this.evData = evData;
   }
 
   // Generate central solar data
@@ -262,22 +284,35 @@ class EnergyDataManager {
     };
   }
 
-  // Calculate backup duration
+  // Calculate backup duration during power outage
   calculateBackupDuration(solarCapacity, batteryCapacity, consumption) {
-    // During blackout, solar panels may still work (if daytime)
-    const hour = new Date().getHours();
-    let solarContribution = 0;
-    if (hour >= 6 && hour <= 18) {
-      solarContribution = solarCapacity * 0.7; // 70% efficiency during blackout
+    const solarContribution = solarCapacity; // kW
+    const netConsumption = consumption - solarContribution; // kW
+    
+    // If solar covers all consumption or more
+    if (netConsumption <= 0) {
+      return {
+        backupHours: '∞ (Solar covers all usage)',
+        solarContribution: solarContribution.toFixed(2) + ' kW',
+        netConsumption: '0.00 kW (Surplus: ' + Math.abs(netConsumption).toFixed(2) + ' kW)'
+      };
     }
     
-    const netConsumption = Math.max(0, consumption - solarContribution);
-    const backupHours = netConsumption > 0 ? batteryCapacity / netConsumption : Infinity;
+    // If no battery
+    if (batteryCapacity <= 0) {
+      return {
+        backupHours: '0 (No battery installed)',
+        solarContribution: solarContribution.toFixed(2) + ' kW',
+        netConsumption: netConsumption.toFixed(2) + ' kW'
+      };
+    }
+    
+    const backupHours = batteryCapacity / netConsumption; // hours
     
     return {
-      backupHours: backupHours === Infinity ? '∞' : backupHours.toFixed(1),
-      solarContribution: solarContribution.toFixed(2),
-      netConsumption: netConsumption.toFixed(2)
+      backupHours: backupHours.toFixed(2) + ' hrs',
+      solarContribution: solarContribution.toFixed(2) + ' kW',
+      netConsumption: netConsumption.toFixed(2) + ' kW'
     };
   }
 
