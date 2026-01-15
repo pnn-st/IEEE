@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Campus Community Energy Data - Energy Management System for Residential Communities">
+  <meta name="keywords" content="energy management, solar power, EV charging, smart home">
+  <title>Campus Community Energy Data - Community Energy Management System</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DynaPuff:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="logo">
+        <div class="logo-icon">
+          <i class="fas fa-bolt"></i>
+        </div>
+        <div class="logo-text">
+          <h1>Energy Data</h1>
+          <p>Community<br>Management</p>
+        </div>
+      </div>
+
+      <nav>
+        <ul class="nav-menu">
+          <li class="nav-item">
+            <a href="#" class="nav-link active" data-page="dashboard">
+              <i class="nav-icon fas fa-chart-line"></i>
+              <span>Dashboard</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link" data-page="digital-twin">
+              <i class="nav-icon fas fa-calculator"></i>
+              <span>Digital Twin</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link" data-page="solar-control">
+              <i class="nav-icon fas fa-solar-panel"></i>
+              <span>Solar Control</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link" data-page="ev-management">
+              <i class="nav-icon fas fa-charging-station"></i>
+              <span>EV Management</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link" data-page="usage-history">
+              <i class="nav-icon fas fa-history"></i>
+              <span>Usage History</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Page 1: Dashboard -->
+      <div id="dashboard" class="page active">
+        <div class="page-header">
+          <h2 class="page-title">Dashboard</h2>
+        </div>
+
+        <!-- Summary Stats -->
+        <div class="grid grid-4 mb-4">
+          <div class="stat-card">
+            <div class="stat-label">Total Consumption</div>
+            <div class="stat-value" id="total-consumption">0 kW</div>
+            <div class="stat-change positive">
+              <i class="fas fa-arrow-down"></i>
+              <span>5.2% from yesterday</span>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-label">Total Houses</div>
+            <div class="stat-value" id="total-houses">12</div>
+            <div class="stat-change positive">
+              <i class="fas fa-check-circle"></i>
+              <span>All Online</span>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-label">Solar Production</div>
+            <div class="stat-value" id="solar-production">0 kW</div>
+            <div class="stat-change positive">
+              <i class="fas fa-sun"></i>
+              <span>Producing</span>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-label">Battery Level</div>
+            <div class="stat-value" id="battery-level">0%</div>
+            <div class="stat-change positive">
+              <i class="fas fa-battery-three-quarters"></i>
+              <span>Good Status</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Real-time Chart -->
+        <div class="card mb-4">
+          <div class="card-header">
+            <h3 class="card-title">Real-time Power Usage</h3>
+          </div>
+          <div class="card-body">
+            <div class="chart-container">
+              <canvas id="realtime-chart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- House Cards -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Power Usage by House</h3>
+          </div>
+          <div class="card-body">
+            <div class="grid grid-3" id="house-cards-container">
+              <!-- House cards will be generated here -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Page 2: Digital Twin Calculator -->
+      <div id="digital-twin" class="page">
+        <div class="page-header">
+          <h2 class="page-title">Digital Twin Calculator</h2>
+          <p class="page-subtitle">Calculate Solar Cell Requirements and Backup Duration</p>
+        </div>
+
+        <div class="grid grid-2">
+          <!-- Solar Cell Calculator -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">
+                <i class="fas fa-solar-panel" style="color: #f59e0b;"></i>
+                Solar Cell Calculator
+              </h3>
+            </div>
+            <div class="card-body">
+              <div class="form-group">
+                <label class="form-label">Select House</label>
+                <select id="solar-calc-house" class="form-select">
+                  <option value="">-- Select House --</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Average Daily Consumption (kWh)</label>
+                <input type="number" id="daily-consumption-input" class="form-input" value="50" step="0.1">
+              </div>
+
+              <button class="btn btn-primary" onclick="calculateSolar()">
+                <i class="fas fa-calculator"></i>
+                Calculate
+              </button>
+
+              <div id="solar-calc-result" class="mt-3" style="display: none;">
+                <div class="alert alert-info">
+                  <i class="fas fa-info-circle"></i>
+                  <div>
+                    <h4 style="margin-bottom: 0.5rem;">Calculation Results</h4>
+                    <p style="margin: 0.25rem 0;"><strong>Recommended System Size:</strong> <span
+                        id="recommended-capacity"></span> kW</p>
+                    <p style="margin: 0.25rem 0;"><strong>Number of Solar Panels:</strong> <span id="panel-count"></span>
+                      panels (400W/panel)</p>
+                    <p style="margin: 0.25rem 0;"><strong>Estimated Cost:</strong> <span id="estimated-cost"></span> THB
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Backup Duration Calculator -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">
+                <i class="fas fa-battery-full" style="color: #10b981;"></i>
+                Backup Duration Calculator
+              </h3>
+            </div>
+            <div class="card-body">
+              <div class="form-group">
+                <label class="form-label">Solar Cell Capacity (kW)</label>
+                <input type="number" id="backup-solar-capacity" class="form-input" value="5" step="0.1">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Battery Capacity (kWh)</label>
+                <input type="number" id="backup-battery-capacity" class="form-input" value="10" step="0.1">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Average Consumption (kW)</label>
+                <input type="number" id="backup-consumption" class="form-input" value="3" step="0.1">
+              </div>
+
+              <button class="btn btn-primary" onclick="calculateBackup()">
+                <i class="fas fa-clock"></i>
+                Calculate
+              </button>
+
+              <div id="backup-calc-result" class="mt-3" style="display: none;">
+                <div class="alert alert-success">
+                  <i class="fas fa-check-circle"></i>
+                  <div>
+                    <h4 style="margin-bottom: 0.5rem;">Calculation Results</h4>
+                    <p style="margin: 0.25rem 0;"><strong>Backup Duration:</strong> <span id="backup-hours"></span>
+                      hours</p>
+                    <p style="margin: 0.25rem 0;"><strong>Solar Power Contribution:</strong> <span
+                        id="solar-contribution"></span> kW</p>
+                    <p style="margin: 0.25rem 0;"><strong>Net Consumption:</strong> <span id="net-consumption"></span> kW
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Visualization -->
+        <div class="card mt-4">
+          <div class="card-header">
+            <h3 class="card-title">Power Usage Comparison by House</h3>
+          </div>
+          <div class="card-body">
+            <div class="chart-container">
+              <canvas id="comparison-chart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Page 3: Solar Control System -->
+      <div id="solar-control" class="page">
+        <div class="page-header">
+          <h2 class="page-title">Solar Control System</h2>
+          <p class="page-subtitle">Control Solar Power Distribution from Central System</p>
+        </div>
+
+        <!-- Solar Overview -->
+        <div class="grid grid-3 mb-4">
+          <div class="stat-card">
+            <div class="stat-label">Current Production</div>
+            <div class="stat-value" id="central-solar-production">0 kW</div>
+            <div class="stat-change positive">
+              <i class="fas fa-sun"></i>
+              <span>of 100 kW</span>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-label">Central Battery</div>
+            <div class="stat-value" id="central-battery-level">0%</div>
+            <div class="progress-bar mt-2">
+              <div class="progress-fill" id="central-battery-progress" style="width: 0%"></div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-label">Power Distribution</div>
+            <div class="stat-value" id="total-allocation">0%</div>
+            <div class="stat-change" id="allocation-status">
+              <i class="fas fa-info-circle"></i>
+              <span>Configuring</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Power Distribution -->
+        <div class="card mb-4">
+          <div class="card-header">
+            <h3 class="card-title">Distribute Power to Each House</h3>
+            <button class="btn btn-secondary" onclick="resetAllocation()">
+              <i class="fas fa-redo"></i>
+              Reset
+            </button>
+          </div>
+          <div class="card-body">
+            <div id="allocation-sliders">
+              <!-- Sliders will be generated here -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Distribution Chart -->
+        <div class="grid grid-2">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Power Distribution Ratio</h3>
+            </div>
+            <div class="card-body">
+              <div class="chart-container">
+                <canvas id="distribution-chart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Blackout Recommendations -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">
+                <i class="fas fa-lightbulb" style="color: #f59e0b;"></i>
+                Blackout Recommendations
+              </h3>
+            </div>
+            <div class="card-body">
+              <div class="form-group">
+                <label class="form-label">Select House for Recommendations</label>
+                <select id="blackout-house-select" class="form-select" onchange="showBlackoutRecommendations()">
+                  <option value="">-- Select House --</option>
+                </select>
+              </div>
+
+              <div id="blackout-recommendations" style="display: none;">
+                <div class="alert alert-danger mb-3">
+                  <i class="fas fa-exclamation-circle"></i>
+                  <div>
+                    <strong>Situation:</strong> Low battery - Turn off appliances in this order
+                  </div>
+                </div>
+
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Order</th>
+                      <th>Appliance</th>
+                      <th>Saved (kW)</th>
+                      <th>Extended Time (hrs)</th>
+                    </tr>
+                  </thead>
+                  <tbody id="recommendations-table">
+                    <!-- Recommendations will be generated here -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Page 4: EV Management -->
+      <div id="ev-management" class="page">
+        <div class="page-header">
+          <h2 class="page-title">EV Management</h2>
+          <p class="page-subtitle">Electric Vehicle Charging Management System</p>
+        </div>
+
+        <!-- EV Stats -->
+        <div class="grid grid-4 mb-4">
+          <div class="stat-card">
+            <div class="stat-label">Total Vehicles</div>
+            <div class="stat-value" id="total-evs">0</div>
+            <div class="stat-change positive">
+              <i class="fas fa-car"></i>
+              <span>Registered</span>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-label">Currently Charging</div>
+            <div class="stat-value" id="charging-evs">0</div>
+            <div class="stat-change positive">
+              <i class="fas fa-charging-station"></i>
+              <span>Vehicles</span>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-label">Power Consumption</div>
+            <div class="stat-value" id="ev-power-consumption">0 kW</div>
+            <div class="stat-change">
+              <i class="fas fa-bolt"></i>
+              <span>Current</span>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-label">Daily Cost</div>
+            <div class="stat-value" id="ev-daily-cost">0 ฿</div>
+            <div class="stat-change">
+              <i class="fas fa-coins"></i>
+              <span>Estimated</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- EV List -->
+        <div class="card mb-4">
+          <div class="card-header">
+            <h3 class="card-title">Electric Vehicle List</h3>
+          </div>
+          <div class="card-body">
+            <div id="ev-list">
+              <!-- EV cards will be generated here -->
+            </div>
+          </div>
+        </div>
+
+        <!-- EV Charts -->
+        <div class="grid grid-2">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Charging Status</h3>
+            </div>
+            <div class="card-body">
+              <div class="chart-container">
+                <canvas id="ev-status-chart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Daily EV Energy Consumption</h3>
+            </div>
+            <div class="card-body">
+              <div class="chart-container">
+                <canvas id="ev-consumption-chart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Page 5: Usage History -->
+      <div id="usage-history" class="page">
+        <div class="page-header">
+          <h2 class="page-title">Usage History</h2>
+          <p class="page-subtitle">Power Usage History for Each House</p>
+        </div>
+
+        <!-- Filters -->
+        <div class="card mb-4">
+          <div class="card-body">
+            <div class="grid grid-3">
+              <div class="form-group">
+                <label class="form-label">Select House</label>
+                <select id="history-house-select" class="form-select" onchange="updateHistory()">
+                  <option value="">-- Select House --</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Time Period</label>
+                <select id="history-period-select" class="form-select" onchange="updateHistory()">
+                  <option value="hourly">Last 24 Hours</option>
+                  <option value="daily">Last 30 Days</option>
+                  <option value="monthly">Last 12 Months</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">&nbsp;</label>
+                <button class="btn btn-primary" onclick="exportData()" style="width: 100%;">
+                  <i class="fas fa-download"></i>
+                  Export CSV
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- House Info -->
+        <div id="house-info-card" class="card mb-4" style="display: none;">
+          <div class="card-header">
+            <h3 class="card-title" id="selected-house-name">House Information</h3>
+          </div>
+          <div class="card-body">
+            <div class="grid grid-4">
+              <div>
+                <div class="stat-label">Current Usage</div>
+                <div class="stat-value" style="font-size: 1.5rem;" id="house-current-consumption">0 kW</div>
+              </div>
+              <div>
+                <div class="stat-label">Daily Usage</div>
+                <div class="stat-value" style="font-size: 1.5rem;" id="house-daily-consumption">0 kWh</div>
+              </div>
+              <div>
+                <div class="stat-label">Monthly Usage</div>
+                <div class="stat-value" style="font-size: 1.5rem;" id="house-monthly-consumption">0 kWh</div>
+              </div>
+              <div>
+                <div class="stat-label">Residents</div>
+                <div class="stat-value" style="font-size: 1.5rem;" id="house-residents">0 people</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Usage Chart -->
+        <div class="card mb-4">
+          <div class="card-header">
+            <h3 class="card-title">Power Usage Chart</h3>
+          </div>
+          <div class="card-body">
+            <div class="chart-container" style="height: 400px;">
+              <canvas id="history-chart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Appliance Breakdown -->
+        <div class="grid grid-2">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Power Usage by Appliance</h3>
+            </div>
+            <div class="card-body">
+              <div class="chart-container">
+                <canvas id="appliance-chart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Comparison with Average</h3>
+            </div>
+            <div class="card-body">
+              <div class="chart-container">
+                <canvas id="comparison-avg-chart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Scripts -->
+  <script src="data.js"></script>
+  <script src="charts.js"></script>
+  <script src="dashboard.js"></script>
+  <script src="digital-twin.js"></script>
+  <script src="solar-control.js"></script>
+  <script src="ev-management.js"></script>
+  <script src="usage-history.js"></script>
+  <script src="app.js"></script>
+</body>
+
+</html>
