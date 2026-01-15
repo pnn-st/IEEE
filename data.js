@@ -27,13 +27,13 @@ class EnergyDataManager {
       try {
         const data = JSON.parse(savedData);
         // Check if any house has consumption outside the new range (50-800 kWh/month)
-        // OR if solar panels are not in range 5-7 (new config is 5-7)
+        // OR if any house has more than 18 solar panels (needed for 40-80% savings on high consumption)
         // OR if EV data is missing model or houseId fields
         if (data.houses && data.houses.length > 0) {
           const hasOutdatedData = data.houses.some(house => 
             house.monthlyConsumption > 800 || 
             house.monthlyConsumption < 50 ||
-            (house.solarPanels > 7 || house.solarPanels < 5 && house.solarPanels > 0) // Check: 5-7 panels or none
+            (house.solarPanels > 18) // Updated check: allow up to 18 panels
           );
           
           // Check EV data structure
