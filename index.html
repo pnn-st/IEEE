@@ -4,14 +4,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Campus Community Energy Data - Energy Management System for Residential Communities">
+  <meta name="description"
+    content="Campus Community Energy Data - Energy Management System for Residential Communities">
   <meta name="keywords" content="energy management, solar power, EV charging, smart home">
-  <title>Campus Community Energy Data - Community Energy Management System</title>
+  <title>Energy Data - Community Energy Management System</title>
 
-  <!-- Fonts -->
+  <!-- Fonts - Inter for English, Kanit for Thai -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DynaPuff:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Kanit:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
 
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -186,7 +189,8 @@
                     <h4 style="margin-bottom: 0.5rem;">Calculation Results</h4>
                     <p style="margin: 0.25rem 0;"><strong>Recommended System Size:</strong> <span
                         id="recommended-capacity"></span> kW</p>
-                    <p style="margin: 0.25rem 0;"><strong>Number of Solar Panels:</strong> <span id="panel-count"></span>
+                    <p style="margin: 0.25rem 0;"><strong>Number of Solar Panels:</strong> <span
+                        id="panel-count"></span>
                       panels (400W/panel)</p>
                     <p style="margin: 0.25rem 0;"><strong>Estimated Cost:</strong> <span id="estimated-cost"></span> THB
                     </p>
@@ -209,14 +213,14 @@
                 <i class="fas fa-info-circle"></i>
                 <span>Select a house to auto-fill with real data, or enter values manually</span>
               </div>
-              
+
               <div class="form-group">
                 <label class="form-label">Select House (Optional)</label>
                 <select id="backup-house-select" class="form-select" onchange="fillBackupFromHouse()">
                   <option value="">-- Select House or Enter Manually --</option>
                 </select>
               </div>
-              
+
               <div class="form-group">
                 <label class="form-label">Solar Cell Capacity (kW)</label>
                 <input type="number" id="backup-solar-capacity" class="form-input" value="5" step="0.1">
@@ -246,7 +250,8 @@
                       hours</p>
                     <p style="margin: 0.25rem 0;"><strong>Solar Power Contribution:</strong> <span
                         id="solar-contribution"></span> kW</p>
-                    <p style="margin: 0.25rem 0;"><strong>Net Consumption:</strong> <span id="net-consumption"></span> kW
+                    <p style="margin: 0.25rem 0;"><strong>Net Consumption:</strong> <span id="net-consumption"></span>
+                      kW
                     </p>
                   </div>
                 </div>

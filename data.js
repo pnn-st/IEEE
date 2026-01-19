@@ -33,7 +33,8 @@ class EnergyDataManager {
           const hasOutdatedData = data.houses.some(house => 
             house.monthlyConsumption > 800 || 
             house.monthlyConsumption < 50 ||
-            (house.solarPanels > 7 || house.solarPanels < 5 && house.solarPanels > 0) // Check: 5-7 panels or none
+            (house.solarPanels > 7 || house.solarPanels < 5 && house.solarPanels > 0) || // Check: 5-7 panels or none
+            (house.solarPanels > 0 && house.batteryLevel === undefined) // Check: missing batteryLevel for solar houses
           );
           
           // Check EV data structure
@@ -58,6 +59,12 @@ class EnergyDataManager {
       this.houses = data.houses;
       this.evData = data.evData;
       this.solarData = data.solarData;
+      
+      // FIX: Ensure daily consumption matches monthly consumption for existing data
+      this.houses.forEach(house => {
+        house.dailyConsumption = house.monthlyConsumption / 30;
+      });
+      this.saveData(); // Save the corrected values
     } else {
       this.generateHouses();
       this.generateEVData();
@@ -100,8 +107,8 @@ class EnergyDataManager {
       // All houses have the same consumption range (300-750 kWh/month = 1,200-3,000 baht)
       // This represents the actual electricity usage before solar offset
       const currentConsumption = this.randomInRange(0.5, 2.5); // 0.5-2.5 kW
-      const dailyConsumption = this.randomInRange(10, 25); // 10-25 kWh/day
       const monthlyConsumption = this.randomInRange(300, 750); // 300-750 kWh/month (1,200-3,000 baht)
+      const dailyConsumption = monthlyConsumption / 30; // Exact consistency
       
       return {
         id: index + 1,
@@ -112,11 +119,44 @@ class EnergyDataManager {
         residents: this.randomInt(2, 6),
         solarPanels: solarPanels,
         batteryCapacity: batteryCapacity, // Correlated with solar capacity
+        batteryLevel: batteryCapacity > 0 ? this.randomInRange(60, 95) : 0, // Battery level % (60-95%)
+        solarProblem: false, // Will be set later for 2 houses
+        blackoutStatus: false, // Will be set later for 3 houses
         appliances: this.generateAppliances(),
         history: this.generateHistory(),
         solarAllocation: 0 // Percentage from central solar
       };
     });
+    
+    // Set 2 random houses with solar panels to have solar problems
+    const housesWithSolar = this.houses.filter(h => h.solarPanels > 0);
+    if (housesWithSolar.length >= 2) {
+      const solarProblemIndices = [];
+      while (solarProblemIndices.length < 2) {
+        const randomHouse = housesWithSolar[this.randomInt(0, housesWithSolar.length - 1)];
+        if (!solarProblemIndices.includes(randomHouse.id)) {
+          solarProblemIndices.push(randomHouse.id);
+          randomHouse.solarProblem = true;
+        }
+      }
+    }
+    
+    // Set 3 random houses to have blackout status
+    const blackoutIndices = [];
+    while (blackoutIndices.length < 3) {
+      const randomIndex = this.randomInt(0, this.houses.length - 1);
+      if (!blackoutIndices.includes(randomIndex)) {
+        blackoutIndices.push(randomIndex);
+        this.houses[randomIndex].blackoutStatus = true;
+        // Ensure blackout houses have some battery capacity
+        if (this.houses[randomIndex].batteryCapacity === 0) {
+          this.houses[randomIndex].batteryCapacity = this.randomInRange(5, 10);
+          this.houses[randomIndex].batteryLevel = this.randomInRange(20, 60); // Lower battery for blackout
+        } else {
+          this.houses[randomIndex].batteryLevel = this.randomInRange(20, 60); // Lower battery for blackout
+        }
+      }
+    }
   }
 
   // Generate appliance data for each house
@@ -256,16 +296,21 @@ class EnergyDataManager {
             appliance.isOn = !appliance.isOn;
           }
         });
+        
+        // Decrease battery level for blackout houses
+        if (house.blackoutStatus && house.batteryLevel > 0) {
+          // Decrease by approximately 0.5-1% every 3 seconds (realistic discharge)
+          const dischargeRate = this.randomInRange(0.5, 1.0);
+          house.batteryLevel = Math.max(0, house.batteryLevel - dischargeRate);
+        }
       });
 
-      // Update solar production (simulate day/night cycle)
-      const hour = new Date().getHours();
-      let productionFactor = 0;
-      if (hour >= 6 && hour <= 18) {
-        productionFactor = Math.sin((hour - 6) * Math.PI / 12);
-      }
+      // Update solar production (always show realistic daytime production for demo)
+      // Simulates peak production hours between 9 AM and 3 PM
+      const simulatedHour = 12; // Simulate 12:00 noon for consistent demo
+      let productionFactor = Math.sin((simulatedHour - 6) * Math.PI / 12); // Peak at noon
       this.solarData.currentProduction = 
-        this.solarData.totalCapacity * productionFactor * this.randomInRange(0.8, 1.0);
+        this.solarData.totalCapacity * productionFactor * this.randomInRange(0.85, 0.98);
 
       // Update EV charging
       this.evData.forEach(ev => {
@@ -365,6 +410,36 @@ class EnergyDataManager {
       backupHours: backupHours.toFixed(2) + ' hrs',
       solarContribution: solarContribution.toFixed(2) + ' kW',
       netConsumption: netConsumption.toFixed(2) + ' kW'
+    };
+  }
+
+  // Calculate blackout duration (how long battery will last)
+  calculateBlackoutDuration(houseId) {
+    const house = this.getHouse(houseId);
+    if (!house) return null;
+    
+    // If no battery, return 0
+    if (house.batteryCapacity <= 0 || house.batteryLevel <= 0) {
+      return {
+        hours: 0,
+        minutes: 0,
+        formatted: 'No battery available'
+      };
+    }
+    
+    // Calculate available battery energy (kWh)
+    const availableEnergy = (house.batteryLevel / 100) * house.batteryCapacity;
+    
+    // Calculate duration in hours
+    const hours = availableEnergy / house.currentConsumption;
+    const wholeHours = Math.floor(hours);
+    const minutes = Math.round((hours - wholeHours) * 60);
+    
+    return {
+      hours: wholeHours,
+      minutes: minutes,
+      totalHours: hours,
+      formatted: `${wholeHours}h ${minutes}m`
     };
   }
 
@@ -497,7 +572,7 @@ class EnergyDataManager {
     };
   }
 
-  // Get savings percentage
+  // Get savings percentage with surplus information
   getSolarSavingsPercentage(houseId) {
     const house = this.getHouse(houseId);
     if (!house) return 0;
@@ -507,10 +582,26 @@ class EnergyDataManager {
     
     if (house.solarPanels > 0) {
       const solarResult = this.calculateSolarMonthlyCost(houseId);
-      return ((solarResult.savings / currentCost) * 100).toFixed(1);
+      const savingsPercent = (solarResult.savings / currentCost) * 100;
+      
+      // Check if solar production exceeds consumption (100% savings)
+      if (savingsPercent >= 100) {
+        const surplus = solarResult.solarProduction - house.monthlyConsumption;
+        return `100 (Surplus: ${surplus.toFixed(0)} kWh)`;
+      }
+      
+      return savingsPercent.toFixed(1);
     } else {
       const potentialResult = this.calculatePotentialSavings(houseId);
-      return ((potentialResult.savings / currentCost) * 100).toFixed(1);
+      const savingsPercent = (potentialResult.savings / currentCost) * 100;
+      
+      // Check if projected solar production exceeds consumption
+      if (savingsPercent >= 100) {
+        const surplus = potentialResult.solarProduction - house.monthlyConsumption;
+        return `100 (Surplus: ${surplus.toFixed(0)} kWh)`;
+      }
+      
+      return savingsPercent.toFixed(1);
     }
   }
 }

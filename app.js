@@ -12,13 +12,25 @@ class App {
   init() {
     // Setup navigation
     this.setupNavigation();
-    
+
     // Initialize all pages
     this.initializePages();
-    
-    // Listen for data updates
+
+    // Listen for data updates (every 3 seconds from real-time updates)
     window.addEventListener('dataUpdated', () => {
       this.refreshCurrentPage();
+    });
+
+    // ⭐ Listen for solar allocation changes (immediate update)
+    window.addEventListener('solarAllocationChanged', () => {
+      // Refresh all pages to show updated solar power distribution
+      this.refreshAllPages();
+    });
+    
+    // ⭐ Listen for language changes (immediate update)
+    window.addEventListener('languageChanged', () => {
+      // Refresh all pages to show updated language
+      this.refreshAllPages();
     });
 
     console.log('✅ Campus Community Energy Data - Application Initialized');
@@ -26,7 +38,7 @@ class App {
 
   setupNavigation() {
     const navLinks = document.querySelectorAll('.nav-link');
-    
+
     navLinks.forEach(link => {
       link.addEventListener('click', (e) => {
         e.preventDefault();
@@ -81,7 +93,7 @@ class App {
   }
 
   refreshCurrentPage() {
-    switch(this.currentPage) {
+    switch (this.currentPage) {
       case 'dashboard':
         if (typeof updateDashboard === 'function') {
           updateDashboard();
@@ -107,6 +119,34 @@ class App {
           updateHistory();
         }
         break;
+    }
+  }
+
+  // ⭐ NEW: Refresh all pages (used when solar allocation changes)
+  refreshAllPages() {
+    // Update Dashboard
+    if (typeof updateDashboard === 'function') {
+      updateDashboard();
+    }
+
+    // Update Digital Twin
+    if (typeof updateDigitalTwin === 'function') {
+      updateDigitalTwin();
+    }
+
+    // Update Solar Control
+    if (typeof updateSolarControl === 'function') {
+      updateSolarControl();
+    }
+
+    // Update EV Management
+    if (typeof updateEVManagement === 'function') {
+      updateEVManagement();
+    }
+
+    // Update Usage History
+    if (typeof updateHistory === 'function') {
+      updateHistory();
     }
   }
 }

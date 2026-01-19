@@ -73,6 +73,41 @@ function updateHouseCards() {
         </div>
       ` : ''}
       
+      ${house.solarProblem ? `
+        <div class="alert-solar-problem">
+          <i class="fas fa-exclamation-triangle"></i>
+          <span><strong>Solar Panel Issue</strong> - System malfunction detected</span>
+        </div>
+      ` : ''}
+      
+      ${house.blackoutStatus ? `
+        <div class="alert-blackout">
+          <div class="alert-blackout-header">
+            <i class="fas fa-power-off"></i>
+            <span>Power Outage</span>
+          </div>
+          <div class="battery-duration">
+            <i class="fas fa-battery-half"></i>
+            <div>
+              <div class="battery-duration-text">Battery: ${window.energyData.calculateBlackoutDuration(house.id).formatted}</div>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">${house.batteryLevel.toFixed(1)}% remaining</div>
+            </div>
+          </div>
+          <div class="recommendations-section">
+            <div class="recommendations-title">💡 Turn off to extend battery:</div>
+            ${(() => {
+              const recommendations = window.energyData.getLoadSheddingRecommendations(house.id);
+              return recommendations.slice(0, 3).map(rec => `
+                <div class="recommendation-item">
+                  <span class="recommendation-appliance">${rec.appliance}</span>
+                  <span class="recommendation-savings">+${rec.extendedTime}h</span>
+                </div>
+              `).join('');
+            })()}
+          </div>
+        </div>
+      ` : ''}
+      
       ${savingsData.hasSolar ? `
         <!-- Houses WITH solar: Show before/after costs -->
         <div class="cost-comparison mt-2">
@@ -168,7 +203,9 @@ function showHouseDetails(houseId) {
   // Get cost comparison data
   const currentCost = window.energyData.calculateCurrentMonthlyCost(house.id);
   const savingsData = window.energyData.calculatePotentialSavings(house.id);
-  const savingsPercentage = window.energyData.getSolarSavingsPercentage(house.id);
+  
+  // Calculate reduction percentage (how much you save, not how much you pay)
+  const reductionPercentage = currentCost > 0 ? ((savingsData.savings / currentCost) * 100).toFixed(1) : 0;
   
   const appliancesHtml = house.appliances.map(a => `
     <tr>
@@ -223,7 +260,7 @@ function showHouseDetails(houseId) {
       </div>
       <div class="card-body">
         <div class="grid grid-2 gap-3 mb-3">
-          <div style="text-align: center; padding: 1rem; background: rgba(239, 68, 68, 0.1); border-radius: 8px; border: 1px solid rgba(239, 68, 68, 0.3);">
+          <div style="text-align: center; padding: 1rem; background: #fff1f2; border-radius: 8px; border: 2px solid #fca5a5;">
             <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem;">
               <i class="fas fa-bolt"></i> Current Cost (No Solar)
             </div>
@@ -235,9 +272,9 @@ function showHouseDetails(houseId) {
             </div>
           </div>
           
-          <div style="text-align: center; padding: 1rem; background: rgba(16, 185, 129, 0.1); border-radius: 8px; border: 1px solid rgba(16, 185, 129, 0.3);">
+          <div style="text-align: center; padding: 1rem; background: #ffffff; border-radius: 8px; border: 2px solid #22c55e; box-shadow: 0 2px 8px rgba(34, 197, 94, 0.15);">
             <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem;">
-              <i class="fas fa-solar-panel"></i> ${savingsData.hasSolar ? 'Cost with Solar' : 'Projected Cost with Solar'}
+              <i class="fas fa-solar-panel"></i> ${savingsData.hasSolar ? 'Cost with Solar' : 'Projected Cost (If Installed)'}
             </div>
             <div style="font-size: 2rem; font-weight: 700; color: var(--success);">
               ${savingsData.cost.toFixed(0)} ฿
@@ -248,18 +285,18 @@ function showHouseDetails(houseId) {
           </div>
         </div>
         
-        <div style="text-align: center; padding: 1.5rem; background: rgba(16, 185, 129, 0.15); border-radius: 8px; border: 2px solid var(--success);">
+        <div style="text-align: center; padding: 1.5rem; background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%); border-radius: 12px; border: 2px solid #22c55e;">
           <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem;">
-            <i class="fas fa-piggy-bank"></i> ${savingsData.hasSolar ? 'Monthly Savings' : 'Potential Monthly Savings'}
+            <i class="fas fa-piggy-bank"></i> Monthly Savings
           </div>
           <div style="font-size: 2.5rem; font-weight: 700; color: var(--success); margin-bottom: 0.5rem;">
-            ${savingsData.savings.toFixed(0)} ฿
+            ${savingsData.hasSolar ? savingsData.savings.toFixed(0) : '0'} ฿
           </div>
           <div style="display: inline-block; padding: 0.5rem 1rem; background: var(--success); color: white; border-radius: 20px; font-weight: 600;">
-            <i class="fas fa-arrow-down"></i> ${savingsPercentage}% reduction
+            <i class="fas fa-arrow-down"></i> Reduction ${savingsData.hasSolar ? reductionPercentage : '0.0'}%
           </div>
           <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 1rem;">
-            <i class="fas fa-calendar-alt"></i> Annual savings: <strong style="color: var(--success);">${(savingsData.savings * 12).toFixed(0)} ฿/year</strong>
+            <i class="fas fa-calendar-alt"></i> Annual savings: <strong style="color: var(--success);">${savingsData.hasSolar ? (savingsData.savings * 12).toFixed(0) : '0'} ฿/year</strong>
           </div>
         </div>
         
@@ -267,7 +304,7 @@ function showHouseDetails(houseId) {
           <div class="alert alert-info mt-3" style="margin-bottom: 0;">
             <i class="fas fa-lightbulb"></i>
             <div>
-              <strong>Recommendation:</strong> Install ${savingsData.recommendedPanels} solar panels (${(savingsData.recommendedPanels * 0.4).toFixed(1)} kW system) to achieve these savings.
+              <strong>Recommendation:</strong> Install ${savingsData.recommendedPanels} solar panels to save <strong>${savingsData.savings.toFixed(0)} ฿/month</strong> (Reduction ${reductionPercentage}%).
               <br><strong>Estimated Investment:</strong> ${((savingsData.recommendedPanels * 0.4) * 50000).toFixed(0)} ฿
               <br><strong>Payback Period:</strong> ~${(((savingsData.recommendedPanels * 0.4) * 50000) / (savingsData.savings * 12)).toFixed(1)} years
             </div>

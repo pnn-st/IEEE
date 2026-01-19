@@ -138,6 +138,9 @@ function handleAllocationChangeWithLock(houseId, requestedPercentage) {
   if (distributionChart) {
     updateDistributionChart();
   }
+  
+  // ⭐ Dispatch event to notify other pages
+  window.dispatchEvent(new CustomEvent('solarAllocationChanged'));
 }
 
 function updateAllSliderStates() {
@@ -294,20 +297,86 @@ function showBlackoutRecommendations() {
     return;
   }
   
+  const house = window.energyData.getHouse(houseId);
+  if (!house) {
+    document.getElementById('blackout-recommendations').style.display = 'none';
+    return;
+  }
+  
+  const recommendationsDiv = document.getElementById('blackout-recommendations');
+  
+  // Check if house has battery (solar panels)
+  if (house.batteryCapacity <= 0 || house.solarPanels === 0) {
+    // House has NO battery
+    recommendationsDiv.innerHTML = `
+      <div class="alert alert-warning mb-3">
+        <i class="fas fa-exclamation-triangle"></i>
+        <div>
+          <strong>No Battery System</strong><br>
+          This house does not have a solar panel system with battery backup.
+          <br><br>
+          <strong>Recommendation:</strong> Consider installing a solar system with battery storage for backup power during outages.
+        </div>
+      </div>
+    `;
+    recommendationsDiv.style.display = 'block';
+    return;
+  }
+  
+  // House HAS battery - show current status and recommendations
+  const batteryDuration = window.energyData.calculateBlackoutDuration(houseId);
   const recommendations = window.energyData.getLoadSheddingRecommendations(houseId);
-  const tbody = document.getElementById('recommendations-table');
-  tbody.innerHTML = '';
+  
+  let html = `
+    <!-- Battery Status -->
+    <div class="alert alert-info mb-3">
+      <i class="fas fa-battery-half"></i>
+      <div>
+        <strong>Current Battery Status:</strong><br>
+        Battery Level: <strong>${house.batteryLevel.toFixed(1)}%</strong> (${(house.batteryLevel / 100 * house.batteryCapacity).toFixed(2)} kWh available)<br>
+        Battery Capacity: <strong>${house.batteryCapacity.toFixed(2)} kWh</strong><br>
+        Current Consumption: <strong>${house.currentConsumption.toFixed(2)} kW</strong><br>
+        <strong style="color: var(--success);">Estimated Duration: ${batteryDuration.formatted}</strong>
+      </div>
+    </div>
+    
+    <!-- Recommendations -->
+    <div class="alert alert-danger mb-3">
+      <i class="fas fa-exclamation-circle"></i>
+      <div>
+        <strong>Power Saving Recommendations:</strong><br>
+        Turn off appliances in this order to extend battery life
+      </div>
+    </div>
+    
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Order</th>
+          <th>Appliance</th>
+          <th>Power (kW)</th>
+          <th>Extended Time</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
   
   recommendations.forEach(rec => {
-    const row = document.createElement('tr');
-    row.innerHTML = `
-      <td>${rec.step}</td>
-      <td>${rec.appliance}</td>
-      <td>${rec.power.toFixed(2)} kW</td>
-      <td>${rec.extendedTime} hrs</td>
+    html += `
+      <tr>
+        <td>${rec.step}</td>
+        <td>${rec.appliance}</td>
+        <td>${rec.power.toFixed(2)} kW</td>
+        <td><strong style="color: var(--success);">${rec.extendedTime} hrs</strong></td>
+      </tr>
     `;
-    tbody.appendChild(row);
   });
   
-  document.getElementById('blackout-recommendations').style.display = 'block';
+  html += `
+      </tbody>
+    </table>
+  `;
+  
+  recommendationsDiv.innerHTML = html;
+  recommendationsDiv.style.display = 'block';
 }
