@@ -116,11 +116,13 @@ body::before {
 
 .logo {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: var(--spacing-md);
-  margin-bottom: var(--spacing-xl);
-  padding-bottom: var(--spacing-xl);
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 1.25rem;
   border-bottom: 2px solid #e5e7eb;
+  text-align: center;
 }
 
 .logo-icon {
@@ -137,27 +139,46 @@ body::before {
   animation: logoGlow 3s ease-in-out infinite;
 }
 
+.logo-image {
+  width: 115px;
+  height: 115px;
+  object-fit: contain;
+  border-radius: var(--radius-md);
+  background: white;
+  padding: 0.6rem;
+  box-shadow: 0 6px 24px rgba(255, 122, 0, 0.4);
+  animation: logoGlow 3s ease-in-out infinite;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.logo-image:hover {
+  transform: scale(1.08) rotate(5deg);
+  box-shadow: 0 8px 30px rgba(255, 154, 64, 0.5);
+}
+
 @keyframes logoGlow {
   0%, 100% { box-shadow: 0 4px 20px rgba(255, 122, 0, 0.35); }
   50% { box-shadow: 0 6px 25px rgba(255, 154, 64, 0.45); }
 }
 
 .logo-text h1 {
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   font-weight: 700;
   background: linear-gradient(135deg, var(--primary-accent), var(--secondary-accent));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  margin-bottom: 0.25rem;
-  letter-spacing: 0.5px;
+  margin-bottom: 0.1rem;
+  letter-spacing: 0.3px;
+  line-height: 1.2;
 }
 
 .logo-text p {
-  font-size: 0.85rem;
+  font-size: 0.68rem;
   color: var(--text-secondary);
   font-weight: 500;
-  line-height: 1.4;
+  line-height: 1.25;
 }
 
 /* Navigation Menu */

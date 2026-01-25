@@ -1,0 +1,119 @@
+/* ===================================
+   Digital Twin Calculator - Premium Styles
+   =================================== */
+
+/* Enhanced Calculator Cards */
+#digital-twin .card {
+  position: relative;
+  overflow: hidden;
+}
+
+#digital-twin .card::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(255, 122, 0, 0.05), transparent);
+  animation: calculatorGlow 6s ease-in-out infinite;
+}
+
+@keyframes calculatorGlow {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.3; }
+  50% { transform: translate(-20px, 20px) scale(1.2); opacity: 0.6; }
+}
+
+#digital-twin .card-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+#digital-twin .card-title i {
+  font-size: 1.5rem;
+  animation: iconFloat 3s ease-in-out infinite;
+}
+
+@keyframes iconFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+/* Calculator Result Boxes */
+#digital-twin .alert {
+  position: relative;
+  overflow: hidden;
+}
+
+#digital-twin .alert::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  animation: resultShine 3s ease-in-out infinite;
+}
+
+@keyframes resultShine {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+#digital-twin .alert h4 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: inherit;
+}
+
+#digital-twin .alert p {
+  margin: 0.5rem 0;
+  font-size: 0.95rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#digital-twin .alert strong {
+  font-weight: 700;
+}
+
+#digital-twin .alert span {
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+/* Enhanced Form Elements for Calculators */
+#digital-twin .form-group {
+  position: relative;
+}
+
+#digital-twin .form-input:focus + .form-label,
+#digital-twin .form-select:focus + .form-label {
+  color: #ff7a00;
+  transform: translateY(-2px);
+}
+
+#digital-twin .btn {
+  width: 100%;
+  justify-content: center;
+  font-size: 1.05rem;
+  padding: 1rem 2rem !important;
+}
+
+#digital-twin .btn i {
+  font-size: 1.2rem;
+}
+
+/* Comparison Chart Enhancement */
+#digital-twin #comparison-chart {
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.05));
+}

@@ -4,8 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description"
-    content="Gearlaxy Power Pool Model - Community Energy Trading and Management System">
+  <meta name="description" content="Gearlaxy Power Pool Model - Community Energy Trading and Management System">
   <meta name="keywords" content="energy management, solar power, EV charging, smart home">
   <title>Gearlaxy Power Pool Model</title>
 
@@ -24,7 +23,13 @@
 
   <!-- Custom Styles -->
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="enhanced-global.css">
   <link rel="stylesheet" href="electricity-trading-styles.css">
+  <link rel="stylesheet" href="central-solar-styles.css">
+  <link rel="stylesheet" href="digital-twin-styles.css">
+  <link rel="stylesheet" href="ev-management-styles.css">
+  <link rel="stylesheet" href="usage-history-styles.css">
+  <link rel="stylesheet" href="profit-analysis-styles.css">
 </head>
 
 <body>
@@ -32,9 +37,7 @@
     <!-- Sidebar Navigation -->
     <aside class="sidebar">
       <div class="logo">
-        <div class="logo-icon">
-          <i class="fas fa-bolt"></i>
-        </div>
+        <img src="Logo_Energy.png" alt="Gearlaxy Logo" class="logo-image">
         <div class="logo-text">
           <h1>Gearlaxy</h1>
           <p>Power Pool<br>Model</p>
@@ -76,9 +79,9 @@
               <span>Central Solar</span>
             </a>
           </li>
-          
+
           <li class="nav-divider">TRADING SYSTEM</li>
-          
+
           <li class="nav-item">
             <a href="#" class="nav-link" data-page="buy-electricity">
               <i class="nav-icon fas fa-shopping-cart"></i>
@@ -108,44 +111,70 @@
         <!-- Content extracted... -->
         <!-- Don't change dashboard content -->
         <div class="page-header">
-          <h2 class="page-title">Dashboard</h2>
+          <div>
+            <h2 class="page-title">
+              <i class="fas fa-chart-line" style="margin-right: 1rem;"></i>
+              Dashboard
+            </h2>
+            <p class="page-subtitle">Real-time monitoring of community energy consumption and production</p>
+          </div>
         </div>
-        
+
         <!-- Summary Stats -->
         <div class="grid grid-4 mb-4">
           <div class="stat-card">
-            <div class="stat-label">Total Consumption</div>
-            <div class="stat-value" id="total-consumption">0 kW</div>
-            <div class="stat-change positive">
-              <i class="fas fa-arrow-down"></i>
-              <span>5.2% from yesterday</span>
+            <div class="stat-icon danger">
+              <i class="fas fa-bolt"></i>
+            </div>
+            <div class="stat-info">
+              <div class="stat-label">Total Consumption</div>
+              <div class="stat-value" id="total-consumption">0 kW</div>
+              <div class="stat-change positive">
+                <i class="fas fa-arrow-down"></i>
+                <span>5.2% from yesterday</span>
+              </div>
             </div>
           </div>
 
           <div class="stat-card">
-            <div class="stat-label">Total Houses</div>
-            <div class="stat-value" id="total-houses">12</div>
-            <div class="stat-change positive">
-              <i class="fas fa-check-circle"></i>
-              <span>All Online</span>
+            <div class="stat-icon primary">
+              <i class="fas fa-home"></i>
+            </div>
+            <div class="stat-info">
+              <div class="stat-label">Total Houses</div>
+              <div class="stat-value" id="total-houses">12</div>
+              <div class="stat-change positive">
+                <i class="fas fa-check-circle"></i>
+                <span>All Online</span>
+              </div>
             </div>
           </div>
 
           <div class="stat-card">
-            <div class="stat-label">Solar Production</div>
-            <div class="stat-value" id="solar-production">0 kW</div>
-            <div class="stat-change positive">
+            <div class="stat-icon warning">
               <i class="fas fa-sun"></i>
-              <span>Producing</span>
+            </div>
+            <div class="stat-info">
+              <div class="stat-label">Solar Production</div>
+              <div class="stat-value" id="solar-production">0 kW</div>
+              <div class="stat-change positive">
+                <i class="fas fa-sun"></i>
+                <span>Producing</span>
+              </div>
             </div>
           </div>
 
           <div class="stat-card">
-            <div class="stat-label">Battery Level</div>
-            <div class="stat-value" id="battery-level">0%</div>
-            <div class="stat-change positive">
+            <div class="stat-icon success">
               <i class="fas fa-battery-three-quarters"></i>
-              <span>Good Status</span>
+            </div>
+            <div class="stat-info">
+              <div class="stat-label">Battery Level</div>
+              <div class="stat-value" id="battery-level">0%</div>
+              <div class="stat-change positive">
+                <i class="fas fa-battery-three-quarters"></i>
+                <span>Good Status</span>
+              </div>
             </div>
           </div>
         </div>
@@ -174,14 +203,19 @@
           </div>
         </div>
       </div>
-      
+
       <!-- Page 2: Digital Twin Calculator -->
       <div id="digital-twin" class="page">
         <!-- Content extracted... -->
         <!-- Don't change digital twin content -->
         <div class="page-header">
-          <h2 class="page-title">Digital Twin Calculator</h2>
-          <p class="page-subtitle">Calculate Solar Cell Requirements and Backup Duration</p>
+          <div>
+            <h2 class="page-title">
+              <i class="fas fa-calculator" style="margin-right: 1rem;"></i>
+              Digital Twin Calculator
+            </h2>
+            <p class="page-subtitle">Calculate Solar Cell Requirements and Backup Duration</p>
+          </div>
         </div>
 
         <div class="grid grid-2">
@@ -306,10 +340,13 @@
       <div id="buy-electricity" class="page">
         <div class="page-header">
           <div style="flex: 1;">
-            <h2 class="page-title">Buy Electricity</h2>
+            <h2 class="page-title">
+              <i class="fas fa-shopping-cart" style="margin-right: 1rem;"></i>
+              Buy Electricity
+            </h2>
             <p class="page-subtitle">รับซื้อไฟฟ้าจากบ้านในหมู่บ้านที่ต้องการขาย</p>
           </div>
-          
+
           <!-- Reserve Energy Display -->
           <div class="reserve-energy-card">
             <div class="reserve-icon">
@@ -404,10 +441,13 @@
       <div id="sell-electricity" class="page">
         <div class="page-header">
           <div style="flex: 1;">
-            <h2 class="page-title">Sell Electricity</h2>
+            <h2 class="page-title">
+              <i class="fas fa-hand-holding-usd" style="margin-right: 1rem;"></i>
+              Sell Electricity
+            </h2>
             <p class="page-subtitle">ขายไฟฟ้าให้บ้านในหมู่บ้านที่ต้องการซื้อ</p>
           </div>
-          
+
           <!-- Reserve Energy Display -->
           <div class="reserve-energy-card">
             <div class="reserve-icon">
@@ -497,12 +537,17 @@
           </div>
         </div>
       </div>
-      
+
       <!-- Page 5: Profit Analysis -->
       <div id="profit-analysis" class="page">
         <div class="page-header">
-          <h2 class="page-title">Profit / Loss Analysis</h2>
-          <p class="page-subtitle">วิเคราะห์กำไรขาดทุนจากการซื้อขายไฟฟ้า</p>
+          <div>
+            <h2 class="page-title">
+              <i class="fas fa-chart-pie" style="margin-right: 1rem;"></i>
+              Profit / Loss Analysis
+            </h2>
+            <p class="page-subtitle">วิเคราะห์กำไรขาดทุนจากการซื้อขายไฟฟ้า</p>
+          </div>
         </div>
 
         <!-- Summary Stats -->
@@ -543,7 +588,7 @@
             </div>
           </div>
         </div>
-        
+
         <!-- Charts -->
         <div class="grid grid-2 mb-4">
           <div class="card">
@@ -556,7 +601,7 @@
               </div>
             </div>
           </div>
-          
+
           <div class="card">
             <div class="card-header">
               <h3 class="card-title">Trading Volume (kWh)</h3>
@@ -568,7 +613,7 @@
             </div>
           </div>
         </div>
-        
+
         <!-- Detailed Transaction Table -->
         <div class="card">
           <div class="card-header">
@@ -600,8 +645,13 @@
       <!-- Page 4: EV Management -->
       <div id="ev-management" class="page">
         <div class="page-header">
-          <h2 class="page-title">EV Management</h2>
-          <p class="page-subtitle">Electric Vehicle Charging Management System</p>
+          <div>
+            <h2 class="page-title">
+              <i class="fas fa-charging-station" style="margin-right: 1rem;"></i>
+              EV Management
+            </h2>
+            <p class="page-subtitle">Electric Vehicle Charging Management System</p>
+          </div>
         </div>
 
         <!-- EV Stats -->
@@ -684,8 +734,13 @@
       <!-- Page 5: Usage History -->
       <div id="usage-history" class="page">
         <div class="page-header">
-          <h2 class="page-title">Usage History</h2>
-          <p class="page-subtitle">Power Usage History for Each House</p>
+          <div>
+            <h2 class="page-title">
+              <i class="fas fa-history" style="margin-right: 1rem;"></i>
+              Usage History
+            </h2>
+            <p class="page-subtitle">Power Usage History for Each House</p>
+          </div>
         </div>
 
         <!-- Filters -->
@@ -785,151 +840,259 @@
       </div>
       <!-- Page: Central Solar -->
       <div id="central-solar" class="page">
-        <header class="page-header">
-          <div>
-            <h2 class="page-title">Central Solar System</h2>
-            <p class="page-subtitle">Monitor central solar status, energy storage, and production efficiency</p>
-          </div>
-          <div class="header-actions">
-            <span class="status-badge"><i class="fas fa-circle status-active"></i> System Active</span>
-            <div class="weather-info">
-              <i class="fas fa-sun text-warning"></i>
-              <span>32°C / UV High</span>
+        <header class="cs-page-header">
+          <div class="cs-header-content">
+            <div class="cs-header-text">
+              <h2 class="cs-page-title">
+                <i class="fas fa-solar-panel cs-title-icon"></i>
+                Central Solar System
+              </h2>
+              <p class="cs-page-subtitle">Monitor central solar status, energy storage, and production efficiency in
+                real-time</p>
+            </div>
+            <div class="cs-header-badges">
+              <div class="cs-status-badge cs-active">
+                <div class="cs-status-pulse"></div>
+                <i class="fas fa-circle"></i>
+                <span>System Active</span>
+              </div>
+              <div class="cs-weather-badge">
+                <i class="fas fa-sun"></i>
+                <div class="cs-weather-text">
+                  <span class="cs-temp">32°C</span>
+                  <span class="cs-uv">UV High</span>
+                </div>
+              </div>
             </div>
           </div>
         </header>
 
-        <div class="dashboard-grid">
-          <!-- Solar Overview Cards -->
-          <div class="card stat-card">
-            <div class="stat-icon warning">
-              <i class="fas fa-sun"></i>
+        <!-- Enhanced Stats Grid -->
+        <div class="cs-stats-grid">
+          <!-- Production Card -->
+          <div class="cs-stat-card cs-card-production">
+            <div class="cs-card-glow cs-glow-orange"></div>
+            <div class="cs-stat-icon-wrapper">
+              <div class="cs-stat-icon cs-icon-production">
+                <i class="fas fa-sun"></i>
+                <div class="cs-icon-rays"></div>
+              </div>
             </div>
-            <div class="stat-info">
-              <p class="stat-label">Current Production</p>
-              <h3 class="stat-value" id="cs-current-production">0.00 kW</h3>
-              <p class="stat-change positive">
-                <i class="fas fa-arrow-up"></i> <span>Capacity: 85%</span>
-              </p>
-            </div>
-          </div>
-
-          <div class="card stat-card">
-            <div class="stat-icon success">
-              <i class="fas fa-battery-three-quarters"></i>
-            </div>
-            <div class="stat-info">
-              <p class="stat-label">Battery Storage</p>
-              <h3 class="stat-value" id="cs-battery-level">76%</h3>
-              <p class="stat-change">
-                <span>Total: 120 kWh</span>
-              </p>
+            <div class="cs-stat-content">
+              <p class="cs-stat-label">Current Production</p>
+              <h3 class="cs-stat-value" id="cs-current-production">0.00 kW</h3>
+              <div class="cs-stat-footer">
+                <span class="cs-stat-badge cs-badge-success">
+                  <i class="fas fa-arrow-up"></i> Capacity: 85%
+                </span>
+              </div>
             </div>
           </div>
 
-          <div class="card stat-card">
-            <div class="stat-icon primary">
-              <i class="fas fa-bolt"></i>
+          <!-- Battery Card -->
+          <div class="cs-stat-card cs-card-battery">
+            <div class="cs-card-glow cs-glow-green"></div>
+            <div class="cs-stat-icon-wrapper">
+              <div class="cs-stat-icon cs-icon-battery">
+                <i class="fas fa-battery-three-quarters"></i>
+                <div class="cs-battery-level-indicator"></div>
+              </div>
             </div>
-            <div class="stat-info">
-              <p class="stat-label">Daily Output</p>
-              <h3 class="stat-value" id="cs-daily-output">342 kWh</h3>
-              <p class="stat-change positive">
-                <i class="fas fa-arrow-up"></i> <span>+12% vs Avg</span>
-              </p>
+            <div class="cs-stat-content">
+              <p class="cs-stat-label">Battery Storage</p>
+              <h3 class="cs-stat-value" id="cs-battery-level">76%</h3>
+              <div class="cs-stat-footer">
+                <span class="cs-stat-badge cs-badge-info">
+                  <i class="fas fa-database"></i> Total: 120 kWh
+                </span>
+              </div>
             </div>
           </div>
 
-          <div class="card stat-card">
-            <div class="stat-icon info">
-              <i class="fas fa-leaf"></i>
+          <!-- Daily Output Card -->
+          <div class="cs-stat-card cs-card-output">
+            <div class="cs-card-glow cs-glow-blue"></div>
+            <div class="cs-stat-icon-wrapper">
+              <div class="cs-stat-icon cs-icon-output">
+                <i class="fas fa-bolt"></i>
+                <div class="cs-bolt-flash"></div>
+              </div>
             </div>
-            <div class="stat-info">
-              <p class="stat-label">CO2 Avoided</p>
-              <h3 class="stat-value" id="cs-co2-saved">158 kg</h3>
-              <p class="stat-change">
-                <span>Today</span>
-              </p>
+            <div class="cs-stat-content">
+              <p class="cs-stat-label">Daily Output</p>
+              <h3 class="cs-stat-value" id="cs-daily-output">342 kWh</h3>
+              <div class="cs-stat-footer">
+                <span class="cs-stat-badge cs-badge-success">
+                  <i class="fas fa-chart-line"></i> +12% vs Avg
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- CO2 Saved Card -->
+          <div class="cs-stat-card cs-card-eco">
+            <div class="cs-card-glow cs-glow-emerald"></div>
+            <div class="cs-stat-icon-wrapper">
+              <div class="cs-stat-icon cs-icon-eco">
+                <i class="fas fa-leaf"></i>
+                <div class="cs-leaf-float"></div>
+              </div>
+            </div>
+            <div class="cs-stat-content">
+              <p class="cs-stat-label">CO₂ Avoided</p>
+              <h3 class="cs-stat-value" id="cs-co2-saved">158 kg</h3>
+              <div class="cs-stat-footer">
+                <span class="cs-stat-badge cs-badge-eco">
+                  <i class="fas fa-seedling"></i> Today
+                </span>
+              </div>
             </div>
           </div>
         </div>
 
-        <div class="dashboard-grid layout-2-1">
-          <!-- Main Chart -->
-          <div class="card col-span-2">
-            <div class="card-header">
-              <h3 class="card-title">Real-time Solar Production</h3>
-              <div class="card-actions">
-                 <span class="badge badge-success">Live</span>
+        <!-- Main Content Grid -->
+        <div class="cs-main-grid">
+          <!-- Production Chart -->
+          <div class="cs-chart-card">
+            <div class="cs-chart-header">
+              <div class="cs-chart-title-group">
+                <h3 class="cs-chart-title">Real-time Solar Production</h3>
+                <p class="cs-chart-subtitle">24-hour production and irradiance tracking</p>
+              </div>
+              <div class="cs-chart-badges">
+                <span class="cs-live-badge">
+                  <span class="cs-live-dot"></span>
+                  Live
+                </span>
+                <button class="cs-chart-btn">
+                  <i class="fas fa-expand"></i>
+                </button>
               </div>
             </div>
-            <div class="card-body">
-              <div class="chart-container" style="height: 300px;">
+            <div class="cs-chart-body">
+              <div class="cs-chart-container">
                 <canvas id="cs-production-chart"></canvas>
               </div>
             </div>
           </div>
 
-          <!-- Status Panel -->
-          <div class="card">
-            <div class="card-header">
-              <h3 class="card-title">System Health</h3>
+          <!-- System Health Panel -->
+          <div class="cs-health-card">
+            <div class="cs-health-header">
+              <h3 class="cs-health-title">
+                <i class="fas fa-heartbeat"></i>
+                System Health
+              </h3>
+              <span class="cs-health-status cs-status-optimal">Optimal</span>
             </div>
-            <div class="card-body">
-              <div class="status-list">
-                <div class="status-item">
-                  <div class="status-label">
-                    <i class="fas fa-server text-primary"></i> Inverter A
+
+            <div class="cs-health-body">
+              <!-- Health Metrics -->
+              <div class="cs-health-list">
+                <div class="cs-health-item">
+                  <div class="cs-health-icon cs-health-primary">
+                    <i class="fas fa-server"></i>
                   </div>
-                  <span class="badge badge-success">Normal</span>
+                  <div class="cs-health-info">
+                    <span class="cs-health-label">Inverter A</span>
+                    <span class="cs-health-value">Normal</span>
+                  </div>
+                  <div class="cs-health-indicator cs-indicator-ok"></div>
                 </div>
-                <div class="status-item">
-                  <div class="status-label">
-                    <i class="fas fa-server text-primary"></i> Inverter B
+
+                <div class="cs-health-item">
+                  <div class="cs-health-icon cs-health-primary">
+                    <i class="fas fa-server"></i>
                   </div>
-                  <span class="badge badge-success">Normal</span>
+                  <div class="cs-health-info">
+                    <span class="cs-health-label">Inverter B</span>
+                    <span class="cs-health-value">Normal</span>
+                  </div>
+                  <div class="cs-health-indicator cs-indicator-ok"></div>
                 </div>
-                <div class="status-item">
-                  <div class="status-label">
-                    <i class="fas fa-solar-panel text-warning"></i> Array Efficiency
+
+                <div class="cs-health-item">
+                  <div class="cs-health-icon cs-health-warning">
+                    <i class="fas fa-solar-panel"></i>
                   </div>
-                  <span class="text-bold">94.2%</span>
+                  <div class="cs-health-info">
+                    <span class="cs-health-label">Array Efficiency</span>
+                    <span class="cs-health-value cs-value-highlight">94.2%</span>
+                  </div>
+                  <div class="cs-health-indicator cs-indicator-ok"></div>
                 </div>
-                <div class="status-item">
-                  <div class="status-label">
-                    <i class="fas fa-thermometer-half text-danger"></i> Panel Temp
+
+                <div class="cs-health-item">
+                  <div class="cs-health-icon cs-health-danger">
+                    <i class="fas fa-thermometer-half"></i>
                   </div>
-                  <span class="text-bold">45°C</span>
+                  <div class="cs-health-info">
+                    <span class="cs-health-label">Panel Temp</span>
+                    <span class="cs-health-value">45°C</span>
+                  </div>
+                  <div class="cs-health-indicator cs-indicator-ok"></div>
                 </div>
-                 <div class="status-item">
-                  <div class="status-label">
-                    <i class="fas fa-wrench text-muted"></i> Last Maintenance
+
+                <div class="cs-health-item">
+                  <div class="cs-health-icon cs-health-muted">
+                    <i class="fas fa-wrench"></i>
                   </div>
-                  <span class="text-muted">12 Jan 2026</span>
+                  <div class="cs-health-info">
+                    <span class="cs-health-label">Last Maintenance</span>
+                    <span class="cs-health-value cs-value-muted">12 Jan 2026</span>
+                  </div>
                 </div>
               </div>
 
-               <div style="margin-top: 1.5rem">
-                  <h4 class="text-sm text-muted mb-2">Energy Distribution</h4>
-                  <div class="progress-bar-container">
-                    <div class="progress-label">To Grid</div>
-                    <div class="progress-bar">
-                      <div class="progress-fill warning" style="width: 20%"></div>
+              <!-- Energy Distribution -->
+              <div class="cs-distribution-section">
+                <h4 class="cs-distribution-title">
+                  <i class="fas fa-chart-pie"></i>
+                  Energy Distribution
+                </h4>
+
+                <div class="cs-distribution-item">
+                  <div class="cs-dist-header">
+                    <span class="cs-dist-label">
+                      <i class="fas fa-plug"></i> To Grid
+                    </span>
+                    <span class="cs-dist-percent">20%</span>
+                  </div>
+                  <div class="cs-progress-bar">
+                    <div class="cs-progress-fill cs-fill-warning" style="width: 20%">
+                      <div class="cs-progress-shine"></div>
                     </div>
                   </div>
-                  <div class="progress-bar-container mt-2">
-                    <div class="progress-label">To Storage</div>
-                    <div class="progress-bar">
-                      <div class="progress-fill success" style="width: 35%"></div>
+                </div>
+
+                <div class="cs-distribution-item">
+                  <div class="cs-dist-header">
+                    <span class="cs-dist-label">
+                      <i class="fas fa-battery-half"></i> To Storage
+                    </span>
+                    <span class="cs-dist-percent">35%</span>
+                  </div>
+                  <div class="cs-progress-bar">
+                    <div class="cs-progress-fill cs-fill-success" style="width: 35%">
+                      <div class="cs-progress-shine"></div>
                     </div>
                   </div>
-                  <div class="progress-bar-container mt-2">
-                     <div class="progress-label">Direct Use</div>
-                    <div class="progress-bar">
-                      <div class="progress-fill primary" style="width: 45%"></div>
+                </div>
+
+                <div class="cs-distribution-item">
+                  <div class="cs-dist-header">
+                    <span class="cs-dist-label">
+                      <i class="fas fa-home"></i> Direct Use
+                    </span>
+                    <span class="cs-dist-percent">45%</span>
+                  </div>
+                  <div class="cs-progress-bar">
+                    <div class="cs-progress-fill cs-fill-primary" style="width: 45%">
+                      <div class="cs-progress-shine"></div>
                     </div>
                   </div>
-               </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

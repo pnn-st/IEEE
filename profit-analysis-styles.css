@@ -1,0 +1,181 @@
+/* ===================================
+   Profit Analysis - Premium Styles
+   =================================== */
+
+/* Enhanced Transaction Table */
+#profit-analysis .pricing-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+#profit-analysis .pricing-table thead {
+  background: linear-gradient(135deg, rgba(255, 122, 0, 0.05), rgba(255, 154, 64, 0.05));
+}
+
+#profit-analysis .pricing-table th {
+  padding: 1rem;
+  font-weight: 700;
+  color: #1f2937;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+#profit-analysis .pricing-table td {
+  padding: 1rem;
+  border-bottom: 1px solid #f3f4f6;
+  transition: all 0.3s ease;
+}
+
+#profit-analysis .pricing-table tbody tr {
+  transition: all 0.3s ease;
+}
+
+#profit-analysis .pricing-table tbody tr:hover {
+  background: rgba(255, 122, 0, 0.02);
+  transform: translateX(4px);
+}
+
+/* Enhanced Type Badges (BUY/SELL) */
+#profit-analysis .badge-primary {
+  background: linear-gradient(135deg, #3b82f6, #60a5fa) !important;
+  color: white !important;
+  padding: 0.5rem 1rem !important;
+  border-radius: 1rem !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3) !important;
+  border: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  font-size: 0.85rem !important;
+  animation: badgePulse 3s ease-in-out infinite;
+}
+
+#profit-analysis .badge-primary::before {
+  content: '🛒';
+  font-size: 1rem;
+}
+
+#profit-analysis .badge-success {
+  background: linear-gradient(135deg, #10b981, #34d399) !important;
+  color: white !important;
+  padding: 0.5rem 1rem !important;
+  border-radius: 1rem !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3) !important;
+  border: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  font-size: 0.85rem !important;
+  animation: badgePulse 3s ease-in-out infinite;
+  animation-delay: 0.5s;
+}
+
+#profit-analysis .badge-success::before {
+  content: '💰';
+  font-size: 1rem;
+}
+
+@keyframes badgePulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); }
+  50% { transform: scale(1.05); box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3); }
+}
+
+/* Amount Colors */
+#profit-analysis .text-danger {
+  color: #ef4444 !important;
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+#profit-analysis .text-success {
+  color: #10b981 !important;
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+/* Balance Column */
+#profit-analysis .pricing-table tbody tr td:last-child {
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+/* Partner Names */
+#profit-analysis .pricing-table tbody tr td:nth-child(3) {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+/* Stat Cards Enhancement for Profit Page */
+#profit-analysis .stat-card.highlight {
+  background: linear-gradient(135deg, rgba(255, 122, 0, 0.1), rgba(255, 154, 64, 0.1)) !important;
+  border: 2px solid rgba(255, 122, 0, 0.3) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+#profit-analysis .stat-card.highlight::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(255, 122, 0, 0.15), transparent);
+  animation: highlightGlow 4s ease-in-out infinite;
+}
+
+@keyframes highlightGlow {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+  50% { transform: translate(-20px, 20px) scale(1.2); opacity: 0.8; }
+}
+
+#profit-analysis .stat-card.highlight .stat-value {
+  font-size: 3rem !important;
+  text-shadow: 0 2px 10px rgba(255, 122, 0, 0.3);
+}
+
+/* Chart Cards */
+#profit-analysis .chart-container {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.9),
+    rgba(249, 250, 251, 0.9)
+  );
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+/* Empty State */
+#profit-analysis .pricing-table .text-center {
+  padding: 3rem !important;
+  color: #9ca3af;
+  font-size: 1.1rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  #profit-analysis .pricing-table {
+    font-size: 0.85rem;
+  }
+
+  #profit-analysis .pricing-table th,
+  #profit-analysis .pricing-table td {
+    padding: 0.75rem 0.5rem;
+  }
+
+  #profit-analysis .badge-primary,
+  #profit-analysis .badge-success {
+    padding: 0.4rem 0.75rem !important;
+    font-size: 0.75rem !important;
+  }
+}
