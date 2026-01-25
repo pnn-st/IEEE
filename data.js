@@ -73,7 +73,7 @@ class EnergyDataManager {
     }
     
     // Start real-time updates
-    this.startRealTimeUpdates();
+    // this.startRealTimeUpdates(); // ❌ DISABLED: Auto-refresh turned off
   }
 
   // Generate house data

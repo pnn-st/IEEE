@@ -13,6 +13,8 @@ function initDashboard() {
   updateDashboard();
   
   // Update real-time chart every 3 seconds
+  // ❌ DISABLED: Auto-refresh turned off
+  /*
   setInterval(() => {
     const totalConsumption = window.energyData.getTotalConsumption();
     const now = new Date();
@@ -24,6 +26,7 @@ function initDashboard() {
       realtimeChart.addDataPoint(timeLabel, totalConsumption);
     }
   }, 3000);
+  */
 }
 
 function updateDashboard() {
