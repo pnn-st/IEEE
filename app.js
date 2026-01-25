@@ -1,6 +1,6 @@
 // ===================================
 // Main Application Controller
-// Campus Community Energy Data
+// Gearlaxy Power Pool Model
 // ===================================
 
 class App {
@@ -33,7 +33,7 @@ class App {
       this.refreshAllPages();
     });
 
-    console.log('✅ Campus Community Energy Data - Application Initialized');
+    console.log('✅ Gearlaxy Power Pool Model - Application Initialized');
   }
 
   setupNavigation() {
@@ -76,9 +76,9 @@ class App {
       initDigitalTwin();
     }
 
-    // Initialize Solar Control
-    if (typeof initSolarControl === 'function') {
-      initSolarControl();
+    // Initialize Electricity Trading
+    if (typeof initElectricityTrading === 'function') {
+      initElectricityTrading();
     }
 
     // Initialize EV Management
@@ -89,6 +89,11 @@ class App {
     // Initialize Usage History
     if (typeof initUsageHistory === 'function') {
       initUsageHistory();
+    }
+
+    // Initialize Central Solar
+    if (typeof initCentralSolar === 'function') {
+      initCentralSolar();
     }
   }
 
@@ -104,9 +109,11 @@ class App {
           updateDigitalTwin();
         }
         break;
-      case 'solar-control':
-        if (typeof updateSolarControl === 'function') {
-          updateSolarControl();
+      case 'buy-electricity':
+      case 'sell-electricity':
+      case 'profit-analysis':
+        if (typeof updateElectricityTrading === 'function') {
+          updateElectricityTrading();
         }
         break;
       case 'ev-management':
@@ -117,6 +124,11 @@ class App {
       case 'usage-history':
         if (typeof updateHistory === 'function') {
           updateHistory();
+        }
+        break;
+      case 'central-solar':
+        if (typeof updateCentralSolar === 'function') {
+          updateCentralSolar();
         }
         break;
     }
@@ -134,9 +146,9 @@ class App {
       updateDigitalTwin();
     }
 
-    // Update Solar Control
-    if (typeof updateSolarControl === 'function') {
-      updateSolarControl();
+    // Update Electricity Trading
+    if (typeof updateElectricityTrading === 'function') {
+      updateElectricityTrading();
     }
 
     // Update EV Management
@@ -147,6 +159,11 @@ class App {
     // Update Usage History
     if (typeof updateHistory === 'function') {
       updateHistory();
+    }
+
+    // Update Central Solar
+    if (typeof updateCentralSolar === 'function') {
+      updateCentralSolar();
     }
   }
 }

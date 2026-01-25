@@ -5,9 +5,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description"
-    content="Campus Community Energy Data - Energy Management System for Residential Communities">
+    content="Gearlaxy Power Pool Model - Community Energy Trading and Management System">
   <meta name="keywords" content="energy management, solar power, EV charging, smart home">
-  <title>Energy Data - Community Energy Management System</title>
+  <title>Gearlaxy Power Pool Model</title>
 
   <!-- Fonts - Inter for English, Kanit for Thai -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -24,6 +24,7 @@
 
   <!-- Custom Styles -->
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="electricity-trading-styles.css">
 </head>
 
 <body>
@@ -35,8 +36,8 @@
           <i class="fas fa-bolt"></i>
         </div>
         <div class="logo-text">
-          <h1>Energy Data</h1>
-          <p>Community<br>Management</p>
+          <h1>Gearlaxy</h1>
+          <p>Power Pool<br>Model</p>
         </div>
       </div>
 
@@ -55,12 +56,6 @@
             </a>
           </li>
           <li class="nav-item">
-            <a href="#" class="nav-link" data-page="solar-control">
-              <i class="nav-icon fas fa-solar-panel"></i>
-              <span>Solar Control</span>
-            </a>
-          </li>
-          <li class="nav-item">
             <a href="#" class="nav-link" data-page="ev-management">
               <i class="nav-icon fas fa-charging-station"></i>
               <span>EV Management</span>
@@ -72,6 +67,36 @@
               <span>Usage History</span>
             </a>
           </li>
+
+          <li class="nav-divider">CENTRAL SYSTEM</li>
+
+          <li class="nav-item">
+            <a href="#" class="nav-link" data-page="central-solar">
+              <i class="nav-icon fas fa-solar-panel"></i>
+              <span>Central Solar</span>
+            </a>
+          </li>
+          
+          <li class="nav-divider">TRADING SYSTEM</li>
+          
+          <li class="nav-item">
+            <a href="#" class="nav-link" data-page="buy-electricity">
+              <i class="nav-icon fas fa-shopping-cart"></i>
+              <span>Buy Electricity</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link" data-page="sell-electricity">
+              <i class="nav-icon fas fa-hand-holding-usd"></i>
+              <span>Sell Electricity</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link" data-page="profit-analysis">
+              <i class="nav-icon fas fa-chart-pie"></i>
+              <span>Profit Analysis</span>
+            </a>
+          </li>
         </ul>
       </nav>
     </aside>
@@ -80,10 +105,12 @@
     <main class="main-content">
       <!-- Page 1: Dashboard -->
       <div id="dashboard" class="page active">
+        <!-- Content extracted... -->
+        <!-- Don't change dashboard content -->
         <div class="page-header">
           <h2 class="page-title">Dashboard</h2>
         </div>
-
+        
         <!-- Summary Stats -->
         <div class="grid grid-4 mb-4">
           <div class="stat-card">
@@ -147,9 +174,11 @@
           </div>
         </div>
       </div>
-
+      
       <!-- Page 2: Digital Twin Calculator -->
       <div id="digital-twin" class="page">
+        <!-- Content extracted... -->
+        <!-- Don't change digital twin content -->
         <div class="page-header">
           <h2 class="page-title">Digital Twin Calculator</h2>
           <p class="page-subtitle">Calculate Solar Cell Requirements and Backup Duration</p>
@@ -273,109 +302,296 @@
         </div>
       </div>
 
-      <!-- Page 3: Solar Control System -->
-      <div id="solar-control" class="page">
+      <!-- Page 3: Buy Electricity (Middleman - Receive from Sellers) -->
+      <div id="buy-electricity" class="page">
         <div class="page-header">
-          <h2 class="page-title">Solar Control System</h2>
-          <p class="page-subtitle">Control Solar Power Distribution from Central System</p>
+          <div style="flex: 1;">
+            <h2 class="page-title">Buy Electricity</h2>
+            <p class="page-subtitle">รับซื้อไฟฟ้าจากบ้านในหมู่บ้านที่ต้องการขาย</p>
+          </div>
+          
+          <!-- Reserve Energy Display -->
+          <div class="reserve-energy-card">
+            <div class="reserve-icon">
+              <i class="fas fa-battery-three-quarters"></i>
+            </div>
+            <div class="reserve-info">
+              <div class="reserve-label">พลังงานสำรอง (ของคุณ)</div>
+              <div class="reserve-value" id="buy-reserve-energy">0 kWh</div>
+            </div>
+          </div>
         </div>
 
-        <!-- Solar Overview -->
+        <!-- Market Overview -->
         <div class="grid grid-3 mb-4">
           <div class="stat-card">
-            <div class="stat-label">Current Production</div>
-            <div class="stat-value" id="central-solar-production">0 kW</div>
+            <div class="stat-label">Houses Selling</div>
+            <div class="stat-value" id="buy-surplus-count">0</div>
             <div class="stat-change positive">
-              <i class="fas fa-sun"></i>
-              <span>of 100 kW</span>
+              <i class="fas fa-home"></i>
+              <span id="buy-total-surplus">0 kW</span>
             </div>
           </div>
 
           <div class="stat-card">
-            <div class="stat-label">Central Battery</div>
-            <div class="stat-value" id="central-battery-level">0%</div>
-            <div class="progress-bar mt-2">
-              <div class="progress-fill" id="central-battery-progress" style="width: 0%"></div>
+            <div class="stat-label">TOU Price (รับซื้อ)</div>
+            <div class="stat-value" id="buy-tou-price">0 ฿</div>
+            <div class="stat-change">
+              <i class="fas fa-clock"></i>
+              <span id="buy-price-period">Peak Hours</span>
             </div>
           </div>
 
           <div class="stat-card">
-            <div class="stat-label">Power Distribution</div>
-            <div class="stat-value" id="total-allocation">0%</div>
-            <div class="stat-change" id="allocation-status">
-              <i class="fas fa-info-circle"></i>
-              <span>Configuring</span>
+            <div class="stat-label">Fixed Price (รับซื้อ)</div>
+            <div class="stat-value" id="buy-fixed-price">0 ฿</div>
+            <div class="stat-change">
+              <i class="fas fa-dollar-sign"></i>
+              <span>คงที่</span>
             </div>
           </div>
         </div>
 
-        <!-- Power Distribution -->
+        <!-- All Sellers Table -->
         <div class="card mb-4">
           <div class="card-header">
-            <h3 class="card-title">Distribute Power to Each House</h3>
-            <button class="btn btn-secondary" onclick="resetAllocation()">
-              <i class="fas fa-redo"></i>
-              Reset
-            </button>
+            <h3 class="card-title">
+              <i class="fas fa-store"></i>
+              บ้านที่ต้องการขายไฟฟ้า (Sellers)
+            </h3>
           </div>
           <div class="card-body">
-            <div id="allocation-sliders">
-              <!-- Sliders will be generated here -->
+            <div class="pricing-table-container">
+              <table class="pricing-table">
+                <thead>
+                  <tr>
+                    <th>บ้าน</th>
+                    <th>ไฟเหลือขาย</th>
+                    <th>จำนวนที่รับซื้อ (kW)</th>
+                    <th>ราคารับซื้อ (Fixed Rate)</th>
+                    <th>รวม</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="all-sellers-list">
+                  <!-- All sellers will be populated here -->
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
 
-        <!-- Distribution Chart -->
-        <div class="grid grid-2">
+        <!-- Transaction History -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">
+              <i class="fas fa-history"></i>
+              ประวัติการรับซื้อ
+            </h3>
+          </div>
+          <div class="card-body">
+            <div id="buy-transaction-history">
+              <div class="empty-state">
+                <i class="fas fa-receipt"></i>
+                <p>No purchases yet</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Page 4: Sell Electricity (Middleman - Sell to Buyers) -->
+      <div id="sell-electricity" class="page">
+        <div class="page-header">
+          <div style="flex: 1;">
+            <h2 class="page-title">Sell Electricity</h2>
+            <p class="page-subtitle">ขายไฟฟ้าให้บ้านในหมู่บ้านที่ต้องการซื้อ</p>
+          </div>
+          
+          <!-- Reserve Energy Display -->
+          <div class="reserve-energy-card">
+            <div class="reserve-icon">
+              <i class="fas fa-battery-three-quarters"></i>
+            </div>
+            <div class="reserve-info">
+              <div class="reserve-label">พลังงานสำรอง (ของคุณ)</div>
+              <div class="reserve-value" id="sell-reserve-energy">0 kWh</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Market Overview -->
+        <div class="grid grid-3 mb-4">
+          <div class="stat-card">
+            <div class="stat-label">Houses Buying</div>
+            <div class="stat-value" id="sell-deficit-count">0</div>
+            <div class="stat-change negative">
+              <i class="fas fa-home"></i>
+              <span id="sell-total-deficit">0 kW</span>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-label">TOU Price (ขาย)</div>
+            <div class="stat-value" id="sell-tou-price">0 ฿</div>
+            <div class="stat-change">
+              <i class="fas fa-clock"></i>
+              <span id="sell-price-period">Peak Hours</span>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-label">Fixed Price (ขาย)</div>
+            <div class="stat-value" id="sell-fixed-price">0 ฿</div>
+            <div class="stat-change">
+              <i class="fas fa-dollar-sign"></i>
+              <span>คงที่</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- All Buyers Table -->
+        <div class="card mb-4">
+          <div class="card-header">
+            <h3 class="card-title">
+              <i class="fas fa-users"></i>
+              บ้านที่ต้องการซื้อไฟฟ้า (Buyers)
+            </h3>
+          </div>
+          <div class="card-body">
+            <div class="pricing-table-container">
+              <table class="pricing-table">
+                <thead>
+                  <tr>
+                    <th>บ้าน</th>
+                    <th>ต้องการซื้อ</th>
+                    <th>จำนวนที่ขาย (kW)</th>
+                    <th>เลือกราคา</th>
+                    <th>รวม</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="all-buyers-list">
+                  <!-- All buyers will be populated here -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Transaction History -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">
+              <i class="fas fa-history"></i>
+              ประวัติการขาย
+            </h3>
+          </div>
+          <div class="card-body">
+            <div id="sell-transaction-history">
+              <div class="empty-state">
+                <i class="fas fa-receipt"></i>
+                <p>No sales yet</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Page 5: Profit Analysis -->
+      <div id="profit-analysis" class="page">
+        <div class="page-header">
+          <h2 class="page-title">Profit / Loss Analysis</h2>
+          <p class="page-subtitle">วิเคราะห์กำไรขาดทุนจากการซื้อขายไฟฟ้า</p>
+        </div>
+
+        <!-- Summary Stats -->
+        <div class="grid grid-4 mb-4">
+          <div class="stat-card">
+            <div class="stat-label">Total Buy Volume</div>
+            <div class="stat-value" id="pl-total-buy-volume">0 kWh</div>
+            <div class="stat-change negative">
+              <i class="fas fa-shopping-cart"></i>
+              <span id="pl-total-buy-cost">0 ฿</span>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-label">Total Sell Volume</div>
+            <div class="stat-value" id="pl-total-sell-volume">0 kWh</div>
+            <div class="stat-change positive">
+              <i class="fas fa-hand-holding-usd"></i>
+              <span id="pl-total-sell-revenue">0 ฿</span>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-label">Energy Holding</div>
+            <div class="stat-value" id="pl-energy-holding">0 kWh</div>
+            <div class="stat-change">
+              <i class="fas fa-battery-half"></i>
+              <span>In Stock</span>
+            </div>
+          </div>
+
+          <div class="stat-card highlight">
+            <div class="stat-label">Net Profit</div>
+            <div class="stat-value" id="pl-net-profit">0 ฿</div>
+            <div class="stat-change" id="pl-profit-percent">
+              <i class="fas fa-chart-line"></i>
+              <span>Margin: 0%</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Charts -->
+        <div class="grid grid-2 mb-4">
           <div class="card">
             <div class="card-header">
-              <h3 class="card-title">Power Distribution Ratio</h3>
+              <h3 class="card-title">Revenue vs Cost</h3>
             </div>
             <div class="card-body">
               <div class="chart-container">
-                <canvas id="distribution-chart"></canvas>
+                <canvas id="pl-revenue-chart"></canvas>
               </div>
             </div>
           </div>
-
-          <!-- Blackout Recommendations -->
+          
           <div class="card">
             <div class="card-header">
-              <h3 class="card-title">
-                <i class="fas fa-lightbulb" style="color: #f59e0b;"></i>
-                Blackout Recommendations
-              </h3>
+              <h3 class="card-title">Trading Volume (kWh)</h3>
             </div>
             <div class="card-body">
-              <div class="form-group">
-                <label class="form-label">Select House for Recommendations</label>
-                <select id="blackout-house-select" class="form-select" onchange="showBlackoutRecommendations()">
-                  <option value="">-- Select House --</option>
-                </select>
+              <div class="chart-container">
+                <canvas id="pl-volume-chart"></canvas>
               </div>
-
-              <div id="blackout-recommendations" style="display: none;">
-                <div class="alert alert-danger mb-3">
-                  <i class="fas fa-exclamation-circle"></i>
-                  <div>
-                    <strong>Situation:</strong> Low battery - Turn off appliances in this order
-                  </div>
-                </div>
-
-                <table class="table">
-                  <thead>
-                    <tr>
-                      <th>Order</th>
-                      <th>Appliance</th>
-                      <th>Saved (kW)</th>
-                      <th>Extended Time (hrs)</th>
-                    </tr>
-                  </thead>
-                  <tbody id="recommendations-table">
-                    <!-- Recommendations will be generated here -->
-                  </tbody>
-                </table>
-              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Detailed Transaction Table -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Transaction Log</h3>
+          </div>
+          <div class="card-body">
+            <div class="pricing-table-container">
+              <table class="pricing-table">
+                <thead>
+                  <tr>
+                    <th>Time</th>
+                    <th>Type</th>
+                    <th>Partner</th>
+                    <th>Volume (kWh)</th>
+                    <th>Price/Unit</th>
+                    <th>Total (฿)</th>
+                    <th>Balance</th>
+                  </tr>
+                </thead>
+                <tbody id="pl-transaction-list">
+                  <!-- Transactions will be populated here -->
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
@@ -567,6 +783,157 @@
           </div>
         </div>
       </div>
+      <!-- Page: Central Solar -->
+      <div id="central-solar" class="page">
+        <header class="page-header">
+          <div>
+            <h2 class="page-title">Central Solar System</h2>
+            <p class="page-subtitle">Monitor central solar status, energy storage, and production efficiency</p>
+          </div>
+          <div class="header-actions">
+            <span class="status-badge"><i class="fas fa-circle status-active"></i> System Active</span>
+            <div class="weather-info">
+              <i class="fas fa-sun text-warning"></i>
+              <span>32°C / UV High</span>
+            </div>
+          </div>
+        </header>
+
+        <div class="dashboard-grid">
+          <!-- Solar Overview Cards -->
+          <div class="card stat-card">
+            <div class="stat-icon warning">
+              <i class="fas fa-sun"></i>
+            </div>
+            <div class="stat-info">
+              <p class="stat-label">Current Production</p>
+              <h3 class="stat-value" id="cs-current-production">0.00 kW</h3>
+              <p class="stat-change positive">
+                <i class="fas fa-arrow-up"></i> <span>Capacity: 85%</span>
+              </p>
+            </div>
+          </div>
+
+          <div class="card stat-card">
+            <div class="stat-icon success">
+              <i class="fas fa-battery-three-quarters"></i>
+            </div>
+            <div class="stat-info">
+              <p class="stat-label">Battery Storage</p>
+              <h3 class="stat-value" id="cs-battery-level">76%</h3>
+              <p class="stat-change">
+                <span>Total: 120 kWh</span>
+              </p>
+            </div>
+          </div>
+
+          <div class="card stat-card">
+            <div class="stat-icon primary">
+              <i class="fas fa-bolt"></i>
+            </div>
+            <div class="stat-info">
+              <p class="stat-label">Daily Output</p>
+              <h3 class="stat-value" id="cs-daily-output">342 kWh</h3>
+              <p class="stat-change positive">
+                <i class="fas fa-arrow-up"></i> <span>+12% vs Avg</span>
+              </p>
+            </div>
+          </div>
+
+          <div class="card stat-card">
+            <div class="stat-icon info">
+              <i class="fas fa-leaf"></i>
+            </div>
+            <div class="stat-info">
+              <p class="stat-label">CO2 Avoided</p>
+              <h3 class="stat-value" id="cs-co2-saved">158 kg</h3>
+              <p class="stat-change">
+                <span>Today</span>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="dashboard-grid layout-2-1">
+          <!-- Main Chart -->
+          <div class="card col-span-2">
+            <div class="card-header">
+              <h3 class="card-title">Real-time Solar Production</h3>
+              <div class="card-actions">
+                 <span class="badge badge-success">Live</span>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="chart-container" style="height: 300px;">
+                <canvas id="cs-production-chart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Status Panel -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">System Health</h3>
+            </div>
+            <div class="card-body">
+              <div class="status-list">
+                <div class="status-item">
+                  <div class="status-label">
+                    <i class="fas fa-server text-primary"></i> Inverter A
+                  </div>
+                  <span class="badge badge-success">Normal</span>
+                </div>
+                <div class="status-item">
+                  <div class="status-label">
+                    <i class="fas fa-server text-primary"></i> Inverter B
+                  </div>
+                  <span class="badge badge-success">Normal</span>
+                </div>
+                <div class="status-item">
+                  <div class="status-label">
+                    <i class="fas fa-solar-panel text-warning"></i> Array Efficiency
+                  </div>
+                  <span class="text-bold">94.2%</span>
+                </div>
+                <div class="status-item">
+                  <div class="status-label">
+                    <i class="fas fa-thermometer-half text-danger"></i> Panel Temp
+                  </div>
+                  <span class="text-bold">45°C</span>
+                </div>
+                 <div class="status-item">
+                  <div class="status-label">
+                    <i class="fas fa-wrench text-muted"></i> Last Maintenance
+                  </div>
+                  <span class="text-muted">12 Jan 2026</span>
+                </div>
+              </div>
+
+               <div style="margin-top: 1.5rem">
+                  <h4 class="text-sm text-muted mb-2">Energy Distribution</h4>
+                  <div class="progress-bar-container">
+                    <div class="progress-label">To Grid</div>
+                    <div class="progress-bar">
+                      <div class="progress-fill warning" style="width: 20%"></div>
+                    </div>
+                  </div>
+                  <div class="progress-bar-container mt-2">
+                    <div class="progress-label">To Storage</div>
+                    <div class="progress-bar">
+                      <div class="progress-fill success" style="width: 35%"></div>
+                    </div>
+                  </div>
+                  <div class="progress-bar-container mt-2">
+                     <div class="progress-label">Direct Use</div>
+                    <div class="progress-bar">
+                      <div class="progress-fill primary" style="width: 45%"></div>
+                    </div>
+                  </div>
+               </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </main>
   </div>
 
@@ -575,9 +942,10 @@
   <script src="charts.js"></script>
   <script src="dashboard.js"></script>
   <script src="digital-twin.js"></script>
-  <script src="solar-control.js"></script>
+  <script src="electricity-trading.js"></script>
   <script src="ev-management.js"></script>
   <script src="usage-history.js"></script>
+  <script src="central-solar.js"></script>
   <script src="app.js"></script>
 </body>
 

@@ -1,6 +1,6 @@
 // ===================================
 // Data Generation & Management
-// Campus Community Energy Data
+// Gearlaxy Power Pool Model
 // ===================================
 
 class EnergyDataManager {
@@ -59,6 +59,7 @@ class EnergyDataManager {
       this.houses = data.houses;
       this.evData = data.evData;
       this.solarData = data.solarData;
+      this.tradingData = data.tradingData; // Load trading data including transactions
       
       // FIX: Ensure daily consumption matches monthly consumption for existing data
       this.houses.forEach(house => {
@@ -334,6 +335,7 @@ class EnergyDataManager {
       houses: this.houses,
       evData: this.evData,
       solarData: this.solarData,
+      tradingData: this.tradingData, // Save trading data including transactions
       lastUpdated: new Date().toISOString()
     };
     localStorage.setItem('energyData', JSON.stringify(data));
@@ -603,6 +605,188 @@ class EnergyDataManager {
       
       return savingsPercent.toFixed(1);
     }
+  }
+
+  // ===================================
+  // Electricity Trading System
+  // ===================================
+
+  // Initialize trading data
+  initializeTradingData() {
+    if (!this.tradingData) {
+      this.tradingData = {
+        externalGridPrice: {
+          peak: 4.5,      // THB/kWh during peak hours (9:00-22:00)
+          offPeak: 2.5,   // THB/kWh during off-peak hours (22:00-9:00)
+          fixed: 4.0      // THB/kWh for fixed rate
+        },
+        solarProductionCost: 1.5, // THB/kWh
+        transactions: [],
+        currentMode: 'tou'
+      };
+      
+      // Initialize Central Solar Data if missing
+      if (!this.tradingData.centralSolar) {
+        this.tradingData.centralSolar = {
+          batteryLevel: 76,
+          batteryCapacity: 200, // kWh
+          totalProduction: 0,
+          totalSold: 0
+        };
+      }
+      
+      this.saveData();
+    }
+  }
+
+  // Get current grid price based on mode and time
+  getCurrentGridPrice(mode = 'tou') {
+    this.initializeTradingData();
+    
+    if (mode === 'fixed') {
+      return this.tradingData.externalGridPrice.fixed;
+    }
+    
+    // TOU mode - check current time
+    const hour = new Date().getHours();
+    const isPeak = hour >= 9 && hour < 22;
+    
+    return isPeak 
+      ? this.tradingData.externalGridPrice.peak 
+      : this.tradingData.externalGridPrice.offPeak;
+  }
+
+  // Get current price period (for display)
+  getCurrentPricePeriod() {
+    const hour = new Date().getHours();
+    const isPeak = hour >= 9 && hour < 22;
+    return isPeak ? 'Peak Hours (9:00-22:00)' : 'Off-Peak Hours (22:00-9:00)';
+  }
+
+  // Calculate house surplus/deficit
+  // Positive = surplus (can sell), Negative = deficit (need to buy)
+  getHouseSurplus(houseId) {
+    const house = this.getHouse(houseId);
+    if (!house) return 0;
+    
+    // Calculate solar production
+    let solarProduction = 0;
+    if (house.solarPanels > 0) {
+      const panelWattage = 0.4; // kW per panel
+      // Assume current production is 70% of capacity (average)
+      solarProduction = house.solarPanels * panelWattage * 0.7;
+    }
+    
+    // Surplus = Production - Consumption
+    return solarProduction - house.currentConsumption;
+  }
+
+  // Calculate community trading price
+  // Ensures 15-30% savings for buyer and profit for seller
+  calculateCommunityPrice(sellerHouseId, buyerHouseId, mode = 'tou') {
+    this.initializeTradingData();
+    
+    const gridPrice = this.getCurrentGridPrice(mode);
+    const solarCost = this.tradingData.solarProductionCost;
+    
+    // Calculate optimal savings percentage (20-25% for balanced trading)
+    // This ensures buyer saves money and seller makes profit
+    const savingsPercent = this.randomInRange(20, 25);
+    
+    // Community price = Grid price - savings
+    const communityPrice = gridPrice * (1 - savingsPercent / 100);
+    
+    // Ensure price is above production cost (seller profit)
+    const minPrice = solarCost * 1.1; // At least 10% profit for seller
+    
+    return Math.max(communityPrice, minPrice);
+  }
+
+  // Middleman buy price (what we pay to sellers)
+  // Lower price = more profit for middleman
+  getBuyPriceFromSeller(mode = 'tou') {
+    this.initializeTradingData();
+    
+    const gridPrice = this.getCurrentGridPrice(mode);
+    const solarCost = this.tradingData.solarProductionCost;
+    
+    // Buy from sellers at 60% of grid price (they still profit vs production cost)
+    // Production cost: 1.5 THB/kWh
+    // Peak grid: 4.5 THB/kWh -> Buy at 2.7 THB/kWh (80% profit for seller)
+    // Off-peak grid: 2.5 THB/kWh -> Buy at 1.65 THB/kWh (10% profit for seller, min 1.65)
+    
+    const buyPrice = gridPrice * 0.6;
+    const minPrice = solarCost * 1.1; // At least 10% profit for seller
+    
+    return Math.max(buyPrice, minPrice);
+  }
+
+  // Middleman sell price (what buyers pay us)
+  // Higher price = more profit for middleman, but still cheaper than grid
+  getSellPriceToBuyer(mode = 'tou') {
+    this.initializeTradingData();
+    
+    const gridPrice = this.getCurrentGridPrice(mode);
+    
+    // Sell to buyers at 85% of grid price (15% savings for them)
+    // Peak grid: 4.5 THB/kWh -> Sell at 3.83 THB/kWh (15% savings)
+    // Off-peak grid: 2.5 THB/kWh -> Sell at 2.13 THB/kWh (15% savings)
+    
+    return gridPrice * 0.85;
+  }
+
+  // Get middleman profit margin
+  getMiddlemanProfit(mode = 'tou') {
+    const buyPrice = this.getBuyPriceFromSeller(mode);
+    const sellPrice = this.getSellPriceToBuyer(mode);
+    return sellPrice - buyPrice;
+  }
+
+  // Record a transaction
+  recordTransaction(transaction) {
+    this.initializeTradingData();
+    
+    this.tradingData.transactions.push(transaction);
+    this.saveData();
+  }
+
+  // Get all transactions
+  getTransactions() {
+    this.initializeTradingData();
+    return this.tradingData.transactions || [];
+  }
+
+  // Get transactions for a specific house
+  getHouseTransactions(houseId) {
+    this.initializeTradingData();
+    
+    return this.tradingData.transactions.filter(tx => 
+      tx.buyerId === houseId || tx.sellerId === houseId
+    );
+  }
+
+  // Calculate total savings for a house
+  getHouseTotalSavings(houseId) {
+    const transactions = this.getHouseTransactions(houseId);
+    
+    return transactions
+      .filter(tx => tx.type === 'buy' && tx.buyerId === houseId)
+      .reduce((sum, tx) => sum + (tx.savings || 0), 0);
+  }
+
+  // Calculate total profit for a house
+  getHouseTotalProfit(houseId) {
+    const transactions = this.getHouseTransactions(houseId);
+    
+    return transactions
+      .filter(tx => tx.type === 'sell' && tx.sellerId === houseId)
+      .reduce((sum, tx) => sum + (tx.profit || 0), 0);
+  }
+
+  // Getter for direct access to transactions
+  get transactions() {
+    this.initializeTradingData();
+    return this.tradingData.transactions || [];
   }
 }
 
